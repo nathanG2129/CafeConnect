@@ -41,10 +41,10 @@ class ImageSection extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.white, // Ensuring contrast
-              ),
-              child: Center(
-                child: Text("IMG", style: TextStyle(fontSize: 20)),
+                image: DecorationImage(
+                  image: AssetImage('assets/coffee2.jpg'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
@@ -55,10 +55,10 @@ class ImageSection extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-              ),
-              child: Center(
-                child: Text("IMG", style: TextStyle(fontSize: 20)),
+                image: DecorationImage(
+                  image: AssetImage('assets/coffee3.jpg'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
