@@ -6,6 +6,7 @@ class PageTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFA9C280), // Set background color
       appBar: AppBar(
         title: Text("PAGE 2"),
         centerTitle: true,
@@ -24,14 +25,9 @@ class PageTwo extends StatelessWidget {
   }
 }
 
-class ImageSection extends StatefulWidget {
+class ImageSection extends StatelessWidget {
   const ImageSection({super.key});
 
-  @override
-  State<ImageSection> createState() => _ImageSectionState();
-}
-
-class _ImageSectionState extends State<ImageSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -45,6 +41,7 @@ class _ImageSectionState extends State<ImageSection> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
+                color: Colors.white, // Ensuring contrast
               ),
               child: Center(
                 child: Text("IMG", style: TextStyle(fontSize: 20)),
@@ -58,6 +55,7 @@ class _ImageSectionState extends State<ImageSection> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
               ),
               child: Center(
                 child: Text("IMG", style: TextStyle(fontSize: 20)),
@@ -70,21 +68,15 @@ class _ImageSectionState extends State<ImageSection> {
   }
 }
 
-class FormSection extends StatefulWidget {
+class FormSection extends StatelessWidget {
   const FormSection({super.key});
 
-  @override
-  State<FormSection> createState() => _FormSectionState();
-}
-
-class _FormSectionState extends State<FormSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          // Two fields in a row
           Row(
             children: [
               Expanded(
@@ -92,6 +84,8 @@ class _FormSectionState extends State<FormSection> {
                   decoration: InputDecoration(
                     labelText: 'Field 1',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white, // Ensuring readability
                   ),
                 ),
               ),
@@ -101,13 +95,14 @@ class _FormSectionState extends State<FormSection> {
                   decoration: InputDecoration(
                     labelText: 'Field 2',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 16),
-          // Two fields in a row
           Row(
             children: [
               Expanded(
@@ -115,6 +110,8 @@ class _FormSectionState extends State<FormSection> {
                   decoration: InputDecoration(
                     labelText: 'Field 3',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
@@ -124,6 +121,8 @@ class _FormSectionState extends State<FormSection> {
                   decoration: InputDecoration(
                     labelText: 'Field 4',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
@@ -135,14 +134,9 @@ class _FormSectionState extends State<FormSection> {
   }
 }
 
-class ButtonSection extends StatefulWidget {
+class ButtonSection extends StatelessWidget {
   const ButtonSection({super.key});
 
-  @override
-  State<ButtonSection> createState() => _ButtonSectionState();
-}
-
-class _ButtonSectionState extends State<ButtonSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -178,4 +172,4 @@ class _ButtonSectionState extends State<ButtonSection> {
       ),
     );
   }
-} 
+}
