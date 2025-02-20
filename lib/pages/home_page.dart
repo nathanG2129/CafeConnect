@@ -10,6 +10,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFA9C280), // Set background color
       appBar: AppBar(
         title: Text("Home"),
         centerTitle: true,
@@ -18,7 +19,7 @@ class HomePage extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(),
+            DrawerHeaderWidget(),
             DrawerListView(),
           ],
         ),
@@ -34,14 +35,9 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class DrawerHeader extends StatefulWidget {
-  const DrawerHeader({super.key});
+class DrawerHeaderWidget extends StatelessWidget {
+  const DrawerHeaderWidget({super.key});
 
-  @override
-  State<DrawerHeader> createState() => _DrawerHeaderState();
-}
-
-class _DrawerHeaderState extends State<DrawerHeader> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -74,14 +70,9 @@ class _DrawerHeaderState extends State<DrawerHeader> {
   }
 }
 
-class DrawerListView extends StatefulWidget {
+class DrawerListView extends StatelessWidget {
   const DrawerListView({super.key});
 
-  @override
-  State<DrawerListView> createState() => _DrawerListViewState();
-}
-
-class _DrawerListViewState extends State<DrawerListView> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -162,9 +153,10 @@ class ImageSection extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text("IMAGE", style: TextStyle(fontSize: 20)),
+        image: DecorationImage(
+          image: AssetImage('flutter_activity1-main/coffee.jpg'),
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
@@ -182,8 +174,13 @@ class TextSection extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
+        color: Colors.white, // Ensuring readability on green background
       ),
-      child: Text("TEXT", style: TextStyle(fontSize: 20)),
+      child: Text(
+        "Cozy Coffee Shops: Brewing Comfort and Community ☕",
+        style: TextStyle(fontSize: 24),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }
@@ -200,11 +197,16 @@ class BodySection extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
+          color: Colors.white, // Ensuring readability
         ),
         child: Center(
-          child: Text("BODY", style: TextStyle(fontSize: 20)),
+          child: Text(
+            "Coffee shops offer a delightful world of flavors, catering to every taste and preference. From bold espresso shots and creamy lattes to the rich, nutty undertones of hazelnut and caramel-infused brews, there’s a perfect cup for everyone. For those who prefer non-coffee options, matcha provides a smooth, earthy alternative packed with antioxidants, while milk-based drinks like chai lattes and hot chocolate offer warmth and comfort in every sip. To complete the experience, an array of pastries—flaky croissants, indulgent cheesecakes, and perfectly baked muffins—pairs beautifully with any drink. Whether you're a coffee lover or simply looking for a cozy treat, coffee shops are the perfect place to indulge in delicious flavors.",
+            style: TextStyle(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
   }
-} 
+}
