@@ -6,6 +6,7 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFA9C280), // Set background color
       appBar: AppBar(
         title: Text("Registration Page"),
         centerTitle: true,
@@ -42,19 +43,23 @@ class _RegistrationFormState extends State<RegistrationForm> {
             decoration: InputDecoration(
               labelText: 'Student Name',
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white, // Ensures readability
             ),
           ),
           SizedBox(height: 16),
-          
+
           // Second row - full width
           TextFormField(
             decoration: InputDecoration(
               labelText: 'Student ID',
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
           SizedBox(height: 16),
-          
+
           // Third row - two fields
           Row(
             children: [
@@ -63,6 +68,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   decoration: InputDecoration(
                     labelText: 'Course',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
@@ -72,13 +79,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   decoration: InputDecoration(
                     labelText: 'Year Level',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 16),
-          
+
           // Fourth row - three fields
           Row(
             children: [
@@ -87,6 +96,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   decoration: InputDecoration(
                     labelText: 'Block',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
@@ -96,6 +107,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   decoration: InputDecoration(
                     labelText: 'Section',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
@@ -105,19 +118,23 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   decoration: InputDecoration(
                     labelText: 'Group',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 16),
-          
+
           // Last row - full width with multiple lines
           TextFormField(
             maxLines: 3,
             decoration: InputDecoration(
               labelText: 'Additional Information',
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
         ],
