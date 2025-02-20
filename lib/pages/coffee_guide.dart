@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
-class PageThree extends StatelessWidget {
-  const PageThree({super.key});
+class CoffeeGuidePage extends StatelessWidget {
+  const CoffeeGuidePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5E6D3), // Warm coffee-themed background
       appBar: AppBar(
-        title: Text("PAGE 3"),
+        title: const Text("Coffee Guide"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
-      body: Column(
+      body: const Column(
         children: [
           ImageSection(),
           TextSection(),
@@ -36,13 +39,14 @@ class _ImageSectionState extends State<ImageSection> {
       flex: 3,
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text("IMAGE", style: TextStyle(fontSize: 20)),
+          image: const DecorationImage(
+            image: AssetImage('assets/coffee3.jpg'),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
@@ -63,10 +67,12 @@ class _TextSectionState extends State<TextSection> {
       flex: 1,
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.all(16),
-        padding: EdgeInsets.all(16),
-        child: Text(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        child: const Text(
+          "Discover the Art of Coffee Making\n\n"
+          "From light to dark roasts, each coffee bean tells a unique story. Our expert baristas craft each drink with precision and care, ensuring the perfect balance of flavors.\n\n"
+          "Visit us to explore our signature drinks and learn about different brewing methods!",
           style: TextStyle(fontSize: 16),
           textAlign: TextAlign.center,
         ),
@@ -86,18 +92,18 @@ class _ButtonSectionState extends State<ButtonSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: ElevatedButton(
         onPressed: () {
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(
-          minimumSize: Size(120, 45),
+          minimumSize: const Size(120, 45),
           backgroundColor: Colors.red[400],
           foregroundColor: Colors.white,
         ),
-        child: Text('Back'),
+        child: const Text('Back'),
       ),
     );
   }
-} 
+}
