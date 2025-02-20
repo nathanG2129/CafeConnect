@@ -8,7 +8,7 @@ class PageThree extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFA9C280), // Set background color
       appBar: AppBar(
-        title: const Text("PAGE 3"),
+        title: const Text("Coffee Guide"),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
@@ -41,9 +41,10 @@ class _ImageSectionState extends State<ImageSection> {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Center(
-          child: Text("IMAGE", style: TextStyle(fontSize: 20)),
+          image: const DecorationImage(
+            image: AssetImage('assets/coffee3.jpg'),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
@@ -67,7 +68,9 @@ class _TextSectionState extends State<TextSection> {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(16),
         child: const Text(
-          "There’s something special about the cozy atmosphere of a coffee shop—the soothing hum of conversation, the rich aroma of freshly brewed coffee, and the warm glow of ambient lighting. Whether you're curled up with a book, catching up with a friend, or simply enjoying a quiet moment alone, coffee shops provide the perfect escape from the outside world. Yet, no matter how much we savor the experience, a good drink never seems to last long. A perfectly brewed coffee, a creamy matcha, or a frothy latte can disappear in just a few sips, leaving behind only the lingering taste and a desire for just one more. In the end, it’s not just about the drink—it’s about the moment of comfort it brings.",
+          "Discover the Art of Coffee Making\n\n"
+          "From light to dark roasts, each coffee bean tells a unique story. Our expert baristas craft each drink with precision and care, ensuring the perfect balance of flavors.\n\n"
+          "Visit us to explore our signature drinks and learn about different brewing methods!",
           style: TextStyle(fontSize: 16),
           textAlign: TextAlign.center,
         ),

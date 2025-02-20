@@ -6,15 +6,15 @@ class PageTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFA9C280), // Set background color
+      backgroundColor: const Color(0xFFA9C280),
       appBar: AppBar(
-        title: Text("PAGE 2"),
+        title: const Text("Order Menu"),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: [
+          children: const [
             ImageSection(),
             FormSection(),
             ButtonSection(),
@@ -74,26 +74,26 @@ class FormSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Field 1',
+                  decoration: const InputDecoration(
+                    labelText: 'Drink Selection',
                     border: OutlineInputBorder(),
                     filled: true,
-                    fillColor: Colors.white, // Ensuring readability
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Field 2',
+                  decoration: const InputDecoration(
+                    labelText: 'Size',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -102,24 +102,24 @@ class FormSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Field 3',
+                  decoration: const InputDecoration(
+                    labelText: 'Add-ons',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Field 4',
+                  decoration: const InputDecoration(
+                    labelText: 'Special Instructions',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
