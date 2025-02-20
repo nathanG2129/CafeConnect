@@ -70,8 +70,61 @@ class ImageSection extends StatelessWidget {
   }
 }
 
-class FormSection extends StatelessWidget {
+class FormSection extends StatefulWidget {
   const FormSection({super.key});
+
+  @override
+  State<FormSection> createState() => _FormSectionState();
+}
+
+class _FormSectionState extends State<FormSection> {
+  String? selectedDrink;
+  String? selectedSize;
+  String? selectedAddOn;
+  String? selectedInstruction;
+
+  final List<String> drinks = [
+    'Espresso',
+    'Cappuccino',
+    'Latte',
+    'Americano',
+    'Mocha',
+    'Cold Brew',
+    'Frappuccino',
+    'Caramel Macchiato',
+    'Flat White',
+  ];
+
+  final List<String> sizes = [
+    'Small (8 oz)',
+    'Medium (12 oz)',
+    'Large (16 oz)',
+    'Extra Large (20 oz)',
+  ];
+
+  final List<String> addOns = [
+    'Extra Shot',
+    'Vanilla Syrup',
+    'Caramel Syrup',
+    'Hazelnut Syrup',
+    'Whipped Cream',
+    'Cinnamon Powder',
+    'Chocolate Drizzle',
+    'Soy Milk',
+    'Almond Milk',
+  ];
+
+  final List<String> instructions = [
+    'Extra Hot',
+    'Less Ice',
+    'Sugar Free',
+    'Light Foam',
+    'Extra Foam',
+    'Double Cup',
+    'No Whip',
+    'Extra Whip',
+    'Stirred',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -82,23 +135,59 @@ class FormSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Drink Selection',
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedDrink,
+                      hint: const Text('Select Drink'),
+                      isExpanded: true,
+                      items: drinks.map((String drink) {
+                        return DropdownMenuItem<String>(
+                          value: drink,
+                          child: Text(drink),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedDrink = newValue;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Size',
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedSize,
+                      hint: const Text('Select Size'),
+                      isExpanded: true,
+                      items: sizes.map((String size) {
+                        return DropdownMenuItem<String>(
+                          value: size,
+                          child: Text(size),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedSize = newValue;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -108,23 +197,59 @@ class FormSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Add-ons',
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedAddOn,
+                      hint: const Text('Select Add-on'),
+                      isExpanded: true,
+                      items: addOns.map((String addOn) {
+                        return DropdownMenuItem<String>(
+                          value: addOn,
+                          child: Text(addOn),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedAddOn = newValue;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Special Instructions',
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedInstruction,
+                      hint: const Text('Special Instructions'),
+                      isExpanded: true,
+                      items: instructions.map((String instruction) {
+                        return DropdownMenuItem<String>(
+                          value: instruction,
+                          child: Text(instruction),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedInstruction = newValue;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
