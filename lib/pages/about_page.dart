@@ -11,13 +11,16 @@ class AboutPage extends StatelessWidget {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            HeaderSection(),
-            InfoSection(),
-            ButtonSection(),
-          ],
+      body: Container(
+        color: Color(0xFFA9C280),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              HeaderSection(),
+              InfoSection(),
+              ButtonSection(),
+            ],
+          ),
         ),
       ),
     );
@@ -100,6 +103,7 @@ class _InfoSectionState extends State<InfoSection> {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
+        color: Colors.white, // Ensure readability with a white background
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,4 +151,4 @@ class _ButtonSectionState extends State<ButtonSection> {
       ),
     );
   }
-} 
+}
