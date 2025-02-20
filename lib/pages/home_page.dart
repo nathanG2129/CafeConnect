@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'registration_page.dart';
-import 'page_two.dart';
-import 'page_three.dart';
+import 'order_menu.dart';
+import 'coffee_guide.dart';
 import 'about_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,18 +10,23 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA9C280), // Set background color
+      backgroundColor: const Color(0xFFF5E6D3),
       appBar: AppBar(
         title: const Text("Home"),
         centerTitle: true,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: const [
-            DrawerHeaderWidget(),
-            DrawerListView(),
-          ],
+        child: Container(
+          color: const Color(0xFFF5E6D3),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: const [
+              DrawerHeaderWidget(),
+              DrawerListView(),
+            ],
+          ),
         ),
       ),
       body: const Column(
@@ -43,27 +48,28 @@ class DrawerHeaderWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        color: Colors.blue,
+        color: Colors.brown,
       ),
       height: 200,
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           CircleAvatar(
             radius: 30,
             backgroundColor: Colors.white,
-            child: Icon(Icons.person, size: 35, color: Colors.blue),
+            child: Icon(Icons.coffee, size: 35, color: Colors.brown),
           ),
-          SizedBox(height: 10),
-          Text(
-            'Navigation Menu',
+          const SizedBox(height: 10),
+          const Text(
+            'CafeConnect Menu',
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
         ],
       ),
     );
@@ -78,15 +84,15 @@ class DrawerListView extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          leading: const Icon(Icons.home),
+          leading: const Icon(Icons.home, color: Colors.brown),
           title: const Text('Home'),
           onTap: () {
             Navigator.pop(context);
           },
         ),
         ListTile(
-          leading: const Icon(Icons.app_registration),
-          title: const Text('Registration'),
+          leading: const Icon(Icons.app_registration, color: Colors.brown),
+          title: const Text('Membership'),
           onTap: () {
             Navigator.pop(context);
             Navigator.push(
@@ -98,33 +104,33 @@ class DrawerListView extends StatelessWidget {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.description),
-          title: const Text('Page 2'),
+          leading: const Icon(Icons.coffee, color: Colors.brown),
+          title: const Text('Order Menu'),
           onTap: () {
             Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const PageTwo(),
+                builder: (context) => const OrderMenuPage(),
               ),
             );
           },
         ),
         ListTile(
-          leading: const Icon(Icons.image),
-          title: const Text('Page 3'),
+          leading: const Icon(Icons.menu_book, color: Colors.brown),
+          title: const Text('Coffee Guide'),
           onTap: () {
             Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const PageThree(),
+                builder: (context) => const CoffeeGuidePage(),
               ),
             );
           },
         ),
         ListTile(
-          leading: const Icon(Icons.info),
+          leading: const Icon(Icons.info, color: Colors.brown),
           title: const Text('About'),
           onTap: () {
             Navigator.pop(context);
@@ -149,11 +155,11 @@ class ImageSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 200,
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
-        image: DecorationImage(
+        image: const DecorationImage(
           image: AssetImage('assets/coffee.jpg'),
           fit: BoxFit.cover,
         ),

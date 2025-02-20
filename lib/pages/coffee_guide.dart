@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class PageThree extends StatelessWidget {
-  const PageThree({super.key});
+class CoffeeGuidePage extends StatelessWidget {
+  const CoffeeGuidePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA9C280), // Set background color
+      backgroundColor: const Color(0xFFF5E6D3), // Warm coffee-themed background
       appBar: AppBar(
         title: const Text("Coffee Guide"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
       body: const Column(
         children: [
