@@ -6,12 +6,15 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5E6D3), // Warm coffee-themed background
       appBar: AppBar(
-        title: Text("Registration Page"),
+        title: const Text("Registration"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
           children: [
             RegistrationForm(),
@@ -34,90 +37,106 @@ class _RegistrationFormState extends State<RegistrationForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           // First row - full width
           TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Student Name',
+            decoration: const InputDecoration(
+              labelText: 'Full Name',
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // Second row - full width
           TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Student ID',
+            decoration: const InputDecoration(
+              labelText: 'Email',
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // Third row - two fields
           Row(
             children: [
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Course',
+                  decoration: const InputDecoration(
+                    labelText: 'Favorite Coffee Type',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Year Level',
+                  decoration: const InputDecoration(
+                    labelText: 'Preferred Visit Time',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // Fourth row - three fields
           Row(
             children: [
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Block',
+                  decoration: const InputDecoration(
+                    labelText: 'Rewards Number',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Section',
+                  decoration: const InputDecoration(
+                    labelText: 'Phone',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Group',
+                  decoration: const InputDecoration(
+                    labelText: 'Preferred Branch',
                     border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // Last row - full width with multiple lines
           TextFormField(
             maxLines: 3,
-            decoration: InputDecoration(
-              labelText: 'Additional Information',
+            decoration: const InputDecoration(
+              labelText: 'Special Preferences / Allergies',
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
         ],
@@ -137,7 +156,7 @@ class _ButtonSectionState extends State<ButtonSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -146,24 +165,24 @@ class _ButtonSectionState extends State<ButtonSection> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(120, 45),
+              minimumSize: const Size(120, 45),
               backgroundColor: Colors.red[400],
               foregroundColor: Colors.white,
             ),
-            child: Text('Back'),
+            child: const Text('Back'),
           ),
           ElevatedButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Student Registration Submitted!')),
+                const SnackBar(content: Text('Student Registration Submitted!')),
               );
             },
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(120, 45),
+              minimumSize: const Size(120, 45),
               backgroundColor: Colors.green[400],
               foregroundColor: Colors.white,
             ),
-            child: Text('Submit'),
+            child: const Text('Submit'),
           ),
         ],
       ),
