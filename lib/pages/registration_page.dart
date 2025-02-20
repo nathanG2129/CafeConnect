@@ -6,15 +6,17 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFA9C280), // Set background color
+      backgroundColor: const Color(0xFFF5E6D3), // Warm coffee-themed background
       appBar: AppBar(
-        title: Text("Registration Page"),
+        title: const Text("Registration"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: [
+          children: const [
             RegistrationForm(),
             ButtonSection(),
           ],

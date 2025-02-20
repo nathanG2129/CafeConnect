@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class PageTwo extends StatelessWidget {
-  const PageTwo({super.key});
+class OrderMenuPage extends StatelessWidget {
+  const OrderMenuPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA9C280),
+      backgroundColor: const Color(0xFFF5E6D3), // Warm coffee-themed background
       appBar: AppBar(
         title: const Text("Order Menu"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(

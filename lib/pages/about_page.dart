@@ -6,21 +6,21 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5E6D3),
       appBar: AppBar(
-        title: Text("About"),
+        title: const Text("About"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.brown,
+        foregroundColor: Colors.white,
       ),
-      body: Container(
-        color: Color(0xFFA9C280),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              HeaderSection(),
-              InfoSection(),
-              ButtonSection(),
-            ],
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: const [
+            HeaderSection(),
+            InfoSection(),
+            ButtonSection(),
+          ],
         ),
       ),
     );
@@ -38,27 +38,29 @@ class _HeaderSectionState extends State<HeaderSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Icon(
             Icons.coffee,
             size: 80,
-            color: Colors.brown,
+            color: Colors.brown[700],
           ),
-          SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 16),
+          const Text(
             "CafeConnect",
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
+              color: Colors.brown,
             ),
           ),
           Text(
             "Your Favorite Coffee Shop",
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
+              fontSize: 18,
+              color: Colors.brown[400],
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -78,7 +80,7 @@ class _InfoSectionState extends State<InfoSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -86,7 +88,7 @@ class _InfoSectionState extends State<InfoSection> {
             "About CafeConnect",
             "Welcome to CafeConnect, your neighborhood coffee destination. We pride ourselves in serving quality coffee and creating a warm, welcoming atmosphere for our community.",
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildInfoCard(
             "Features",
             "• Premium Coffee Selection\n• Comfortable Atmosphere\n• Friendly Service\n• Mobile Ordering\n• Membership Rewards",
@@ -99,11 +101,19 @@ class _InfoSectionState extends State<InfoSection> {
   Widget _buildInfoCard(String title, String content) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
+        border: Border.all(color: Colors.brown[200]!),
         borderRadius: BorderRadius.circular(8),
-        color: Colors.white, // Ensure readability with a white background
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.brown.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,14 +121,19 @@ class _InfoSectionState extends State<InfoSection> {
           Text(
             title,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
+              color: Colors.brown[700],
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             content,
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.brown[600],
+              height: 1.5,
+            ),
           ),
         ],
       ),
@@ -137,17 +152,17 @@ class _ButtonSectionState extends State<ButtonSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: ElevatedButton(
         onPressed: () {
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(
-          minimumSize: Size(120, 45),
+          minimumSize: const Size(120, 45),
           backgroundColor: Colors.red[400],
           foregroundColor: Colors.white,
         ),
-        child: Text('Back'),
+        child: const Text('Back'),
       ),
     );
   }
