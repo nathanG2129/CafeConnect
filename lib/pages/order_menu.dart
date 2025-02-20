@@ -14,9 +14,9 @@ class OrderMenuPage extends StatelessWidget {
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
-          children: const [
+          children: [
             ImageSection(),
             FormSection(),
             ButtonSection(),
@@ -33,17 +33,17 @@ class ImageSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         children: [
           Expanded(
             child: Container(
               height: 150,
-              margin: EdgeInsets.only(right: 8),
+              margin: const EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
+                image: const DecorationImage(
                   image: AssetImage('assets/coffee2.jpg'),
                   fit: BoxFit.cover,
                 ),
@@ -53,11 +53,11 @@ class ImageSection extends StatelessWidget {
           Expanded(
             child: Container(
               height: 150,
-              margin: EdgeInsets.only(left: 8),
+              margin: const EdgeInsets.only(left: 8),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
+                image: const DecorationImage(
                   image: AssetImage('assets/coffee3.jpg'),
                   fit: BoxFit.cover,
                 ),
@@ -267,7 +267,7 @@ class ButtonSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -276,24 +276,24 @@ class ButtonSection extends StatelessWidget {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(120, 45),
+              minimumSize: const Size(120, 45),
               backgroundColor: Colors.red[400],
               foregroundColor: Colors.white,
             ),
-            child: Text('Back'),
+            child: const Text('Back'),
           ),
           ElevatedButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Profile Updated!')),
+                const SnackBar(content: Text('Profile Updated!')),
               );
             },
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(120, 45),
+              minimumSize: const Size(120, 45),
               backgroundColor: Colors.green[400],
               foregroundColor: Colors.white,
             ),
-            child: Text('Submit'),
+            child: const Text('Submit'),
           ),
         ],
       ),

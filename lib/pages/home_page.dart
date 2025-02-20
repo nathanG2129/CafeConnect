@@ -51,7 +51,7 @@ class DrawerHeaderWidget extends StatelessWidget {
         color: Colors.brown,
       ),
       height: 200,
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -60,8 +60,8 @@ class DrawerHeaderWidget extends StatelessWidget {
             backgroundColor: Colors.white,
             child: Icon(Icons.coffee, size: 35, color: Colors.brown),
           ),
-          const SizedBox(height: 10),
-          const Text(
+          SizedBox(height: 10),
+          Text(
             'CafeConnect Menu',
             style: TextStyle(
               color: Colors.white,
@@ -69,7 +69,7 @@ class DrawerHeaderWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: 5),
         ],
       ),
     );
