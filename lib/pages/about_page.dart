@@ -14,9 +14,9 @@ class AboutPage extends StatelessWidget {
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
-          children: const [
+          children: [
             HeaderSection(),
             InfoSection(),
             ButtonSection(),
