@@ -41,32 +41,32 @@ class _RegistrationFormState extends State<RegistrationForm> {
           // First row - full width
           TextFormField(
             decoration: InputDecoration(
-              labelText: 'Student Name',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Colors.white, // Ensures readability
-            ),
-          ),
-          SizedBox(height: 16),
-
-          // Second row - full width
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Student ID',
+              labelText: 'Full Name',
               border: OutlineInputBorder(),
               filled: true,
               fillColor: Colors.white,
             ),
           ),
           SizedBox(height: 16),
-
+          
+          // Second row - full width
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+          ),
+          SizedBox(height: 16),
+          
           // Third row - two fields
           Row(
             children: [
               Expanded(
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: 'Course',
+                    labelText: 'Favorite Coffee Type',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -77,7 +77,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               Expanded(
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: 'Year Level',
+                    labelText: 'Preferred Visit Time',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -87,14 +87,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
             ],
           ),
           SizedBox(height: 16),
-
+          
           // Fourth row - three fields
           Row(
             children: [
               Expanded(
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: 'Block',
+                    labelText: 'Rewards Number',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -105,7 +105,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               Expanded(
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: 'Section',
+                    labelText: 'Phone',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -116,7 +116,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               Expanded(
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: 'Group',
+                    labelText: 'Preferred Branch',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -126,12 +126,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
             ],
           ),
           SizedBox(height: 16),
-
+          
           // Last row - full width with multiple lines
           TextFormField(
             maxLines: 3,
             decoration: InputDecoration(
-              labelText: 'Additional Information',
+              labelText: 'Special Preferences / Allergies',
               border: OutlineInputBorder(),
               filled: true,
               fillColor: Colors.white,

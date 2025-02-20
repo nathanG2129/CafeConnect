@@ -174,11 +174,14 @@ class TextSection extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
-        color: Colors.white, // Ensuring readability on green background
+        color: Colors.white,
       ),
       child: const Text(
-        "Cozy Coffee Shops: Brewing Comfort and Community ☕",
-        style: TextStyle(fontSize: 24),
+        "Welcome to CafeConnect ☕",
+        style: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -194,17 +197,47 @@ class BodySection extends StatelessWidget {
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
-          color: Colors.white, // Ensuring readability
+          color: Colors.white,
         ),
-        child: const Center(
-          child: Text(
-            "Coffee shops offer a delightful world of flavors, catering to every taste and preference. From bold espresso shots and creamy lattes to the rich, nutty undertones of hazelnut and caramel-infused brews, there's a perfect cup for everyone. For those who prefer non-coffee options, matcha provides a smooth, earthy alternative packed with antioxidants, while milk-based drinks like chai lattes and hot chocolate offer warmth and comfort in every sip. To complete the experience, an array of pastries—flaky croissants, indulgent cheesecakes, and perfectly baked muffins—pairs beautifully with any drink. Whether you're a coffee lover or simply looking for a cozy treat, coffee shops are the perfect place to indulge in delicious flavors.",
-            style: TextStyle(fontSize: 18),
-            textAlign: TextAlign.center,
-          ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Daily Specials",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            Text(
+              "• Caramel Macchiato - \$4.99\n• Fresh Baked Croissants - \$3.50\n• Iced Coffee Special - \$3.99",
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            Text(
+              "Hours",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Monday - Friday: 7:00 AM - 8:00 PM\nSaturday - Sunday: 8:00 AM - 6:00 PM",
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

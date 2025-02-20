@@ -42,20 +42,20 @@ class _HeaderSectionState extends State<HeaderSection> {
       child: Column(
         children: [
           Icon(
-            Icons.school,
+            Icons.coffee,
             size: 80,
-            color: Colors.blue,
+            color: Colors.brown,
           ),
           SizedBox(height: 16),
           Text(
-            "Flutter Activity App",
+            "CafeConnect",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            "Student Registration System",
+            "Your Favorite Coffee Shop",
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey,
@@ -83,13 +83,13 @@ class _InfoSectionState extends State<InfoSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildInfoCard(
-            "About This App",
-            "This Flutter application was created as part of a student activity to explore and implement various Flutter widgets and layouts. It demonstrates the use of both stateless and stateful widgets, different layout options, and file navigation.",
+            "About CafeConnect",
+            "Welcome to CafeConnect, your neighborhood coffee destination. We pride ourselves in serving quality coffee and creating a warm, welcoming atmosphere for our community.",
           ),
           SizedBox(height: 16),
           _buildInfoCard(
             "Features",
-            "• Drawer Navigation with Header\n• Multiple Page Navigation\n• Student Registration Form\n• Various Layout Implementations\n• Stateful and Stateless Widgets",
+            "• Premium Coffee Selection\n• Comfortable Atmosphere\n• Friendly Service\n• Mobile Ordering\n• Membership Rewards",
           ),
         ],
       ),
