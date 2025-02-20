@@ -6,6 +6,7 @@ class PageThree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFA9C280), // Set background color
       appBar: AppBar(
         title: Text("PAGE 3"),
         centerTitle: true,
@@ -66,7 +67,7 @@ class _TextSectionState extends State<TextSection> {
         margin: EdgeInsets.all(16),
         padding: EdgeInsets.all(16),
         child: Text(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+          "There’s something special about the cozy atmosphere of a coffee shop—the soothing hum of conversation, the rich aroma of freshly brewed coffee, and the warm glow of ambient lighting. Whether you're curled up with a book, catching up with a friend, or simply enjoying a quiet moment alone, coffee shops provide the perfect escape from the outside world. Yet, no matter how much we savor the experience, a good drink never seems to last long. A perfectly brewed coffee, a creamy matcha, or a frothy latte can disappear in just a few sips, leaving behind only the lingering taste and a desire for just one more. In the end, it’s not just about the drink—it’s about the moment of comfort it brings.",
           style: TextStyle(fontSize: 16),
           textAlign: TextAlign.center,
         ),
@@ -100,4 +101,4 @@ class _ButtonSectionState extends State<ButtonSection> {
       ),
     );
   }
-} 
+}
