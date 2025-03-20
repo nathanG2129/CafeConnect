@@ -228,6 +228,7 @@ class OrderDialog extends StatefulWidget {
 class _OrderDialogState extends State<OrderDialog> {
   String? selectedSize;
   String? selectedAddOn;
+  int quantity = 1;
   bool showSizeError = false;
   final List<String> sizes = ['Small', 'Medium', 'Large'];
   final List<String> addOns = [
@@ -237,6 +238,31 @@ class _OrderDialogState extends State<OrderDialog> {
     'Chocolate Sauce (+\$0.30)',
   ];
 
+  // Price modifiers
+  final Map<String, double> sizePrices = {
+    'Small': 0.0,
+    'Medium': 0.50,
+    'Large': 1.00,
+  };
+
+  final Map<String, double> addOnPrices = {
+    'Extra Shot (+\$0.50)': 0.50,
+    'Whipped Cream (+\$0.50)': 0.50,
+    'Caramel Drizzle (+\$0.30)': 0.30,
+    'Chocolate Sauce (+\$0.30)': 0.30,
+  };
+
+  double get totalPrice {
+    double basePrice = widget.coffee['price'];
+    if (selectedSize != null) {
+      basePrice += sizePrices[selectedSize]!;
+    }
+    if (selectedAddOn != null) {
+      basePrice += addOnPrices[selectedAddOn]!;
+    }
+    return basePrice * quantity;
+  }
+
   void _handleAddToCart() {
     if (selectedSize == null) {
       setState(() {
@@ -245,13 +271,29 @@ class _OrderDialogState extends State<OrderDialog> {
       return;
     }
 
+    // Calculate total price
+    final total = totalPrice;
+
     // If size is selected, proceed with order
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Added ${widget.coffee['name']} ($selectedSize) to cart!',
+          'Added ${quantity}x ${widget.coffee['name']} ($selectedSize)${selectedAddOn != null ? ' with $selectedAddOn' : ''} to cart - Total: \$${total.toStringAsFixed(2)}',
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green[600],
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'UNDO',
+          textColor: Colors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Order removed from cart'),
+                backgroundColor: Colors.brown[700],
+              ),
+            );
+          },
+        ),
       ),
     );
     Navigator.pop(context);
@@ -317,23 +359,24 @@ class _OrderDialogState extends State<OrderDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title and Price
+                  // Title and Base Price
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        widget.coffee['name'],
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown,
+                      Expanded(
+                        child: Text(
+                          widget.coffee['name'],
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown,
+                          ),
                         ),
                       ),
                       Text(
-                        '\$${widget.coffee['price'].toStringAsFixed(2)}',
+                        'Base: \$${widget.coffee['price'].toStringAsFixed(2)}',
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                           color: Colors.brown[700],
                         ),
                       ),
@@ -348,34 +391,89 @@ class _OrderDialogState extends State<OrderDialog> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Size Selection
+
+                  // Quantity Selection
+                  Row(
+                    children: [
+                      const Text(
+                        'Quantity:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.brown,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.brown),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: quantity > 1
+                                  ? () => setState(() => quantity--)
+                                  : null,
+                              color: Colors.brown,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                quantity.toString(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: quantity < 10
+                                  ? () => setState(() => quantity++)
+                                  : null,
+                              color: Colors.brown,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Size Selection with price indicators
                   DropdownButtonFormField<String>(
                     value: selectedSize,
                     decoration: InputDecoration(
                       labelText: 'Size *',
                       border: const OutlineInputBorder(),
                       errorText: showSizeError ? 'Please select a size' : null,
+                      helperText: 'Price adjustments: Medium +\$0.50, Large +\$1.00',
                     ),
                     items: sizes.map((String size) {
                       return DropdownMenuItem<String>(
                         value: size,
-                        child: Text(size),
+                        child: Text('$size ${sizePrices[size]! > 0 ? "(+\$${sizePrices[size]!.toStringAsFixed(2)})" : ""}'),
                       );
                     }).toList(),
                     onChanged: (String? value) {
                       setState(() {
                         selectedSize = value;
-                        showSizeError = false; // Clear error when size is selected
+                        showSizeError = false;
                       });
                     },
                   ),
                   const SizedBox(height: 16),
+
                   // Add-ons Selection
                   DropdownButtonFormField<String>(
                     value: selectedAddOn,
                     decoration: const InputDecoration(
                       labelText: 'Add-ons (Optional)',
                       border: OutlineInputBorder(),
+                      helperText: 'Customize your drink with extra toppings',
                     ),
                     items: addOns.map((String addOn) {
                       return DropdownMenuItem<String>(
@@ -390,6 +488,39 @@ class _OrderDialogState extends State<OrderDialog> {
                     },
                   ),
                   const SizedBox(height: 24),
+
+                  // Total Price Display
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.brown[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.brown[200]!),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Total Price:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown,
+                          ),
+                        ),
+                        Text(
+                          '\$${totalPrice.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
                   // Action Buttons
                   Row(
                     children: [
