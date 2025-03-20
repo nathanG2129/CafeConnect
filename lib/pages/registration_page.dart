@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+final _fullName = TextEditingController();
+final _phoneNumber = TextEditingController();
+bool _validateFname = false;
+bool _validateFNumber = false;
 
 class RegistrationPage extends StatelessWidget {
   const RegistrationPage({super.key});
@@ -17,8 +23,9 @@ class RegistrationPage extends StatelessWidget {
       body: const SingleChildScrollView(
         child: Column(
           children: [
-            RegistrationForm(),
-            ButtonSection(),
+            // RegistrationForm(),
+            // ButtonSection(),
+            ValidationSections()
           ],
         ),
       ),
@@ -150,6 +157,87 @@ class ButtonSection extends StatefulWidget {
 
   @override
   State<ButtonSection> createState() => _ButtonSectionState();
+}
+
+class ValidationSections extends StatefulWidget{
+  const ValidationSections({super.key});
+
+  @override
+  _ValidationSections createState() => _ValidationSections();
+}
+
+class _ValidationSections extends State<ValidationSections> {
+  @override
+
+  Widget build(BuildContext context){
+    return Padding(padding:
+    const EdgeInsets.all(30),
+      child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            spacing: 16,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(child:
+                TextField(
+                  controller: _fullName,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(11),
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Full Name',
+                    border: const OutlineInputBorder(),
+                    hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    errorText: _validateFname ? 'Please enter your full name' : null
+                  ),
+                ),
+              ),
+              Expanded(child:
+                TextField(
+                  controller: _phoneNumber,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(11),
+                    FilteringTextInputFormatter(RegExp(r'^[0-9]+$'), allow: true),
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    border: const OutlineInputBorder(),
+                    hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    hintMaxLines: 2,
+                      errorText: _validateFNumber ? 'Phone number cannot be empty/null' : null
+                  ),
+                ),
+              ),
+              Expanded(child:
+                ElevatedButton(onPressed: () {
+                  setState(() {
+                    validateSections();
+                  });
+                },
+                    child: const Text('Submit'),
+                )
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+void validateSections() {
+  if(_fullName.text.isEmpty){
+    _validateFname = true;
+  } else {
+    _validateFname = false;
+  }
+  if(_phoneNumber.text.isEmpty){
+    _validateFNumber = true;
+  } else {
+    _validateFNumber = false;
+  }
 }
 
 class _ButtonSectionState extends State<ButtonSection> {
