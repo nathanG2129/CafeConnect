@@ -55,6 +55,7 @@ class _HeaderSection extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             "Join Our Coffee Community",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
