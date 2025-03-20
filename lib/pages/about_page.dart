@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/app_drawer.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -10,10 +11,10 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("About"),
         centerTitle: true,
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
       ),
+      drawer: const AppDrawer(),
       body: const SingleChildScrollView(
         child: Column(
           children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/app_drawer.dart';
 
 class CoffeeGuidePage extends StatelessWidget {
   const CoffeeGuidePage({super.key});
@@ -10,10 +11,10 @@ class CoffeeGuidePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Coffee Guide"),
         centerTitle: true,
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
       ),
+      drawer: const AppDrawer(),
       body: const Column(
         children: [
           ImageSection(),
