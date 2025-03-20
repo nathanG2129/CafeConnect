@@ -19,9 +19,59 @@ class RegistrationPage extends StatelessWidget {
       body: const SingleChildScrollView(
         child: Column(
           children: [
+            _HeaderSection(),
             RegistrationForm(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _HeaderSection extends StatelessWidget {
+  const _HeaderSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.brown[700],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.brown.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.app_registration, color: Colors.amber[300], size: 48),
+          const SizedBox(height: 16),
+          const Text(
+            "Join Our Coffee Community",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Sign up for exclusive offers and personalized recommendations",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.brown[100],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -42,6 +92,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   String? _selectedCoffeeType;
   String? _selectedVisitTime;
   bool _acceptTerms = false;
+  bool _showValidationErrors = false;
 
   final _emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   final _phoneRegex = RegExp(r'^\+?[(]?[0-9]+[)]?[-\s.]?[0-9]+[-\s.]?[0-9]+$');
@@ -78,16 +129,20 @@ class _RegistrationFormState extends State<RegistrationForm> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Card(
-                  elevation: 2,
+                  elevation: 4,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Padding(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.brown.withOpacity(0.2)),
+                    ),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,11 +215,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 ),
                 const SizedBox(height: 24),
                 Card(
-                  elevation: 2,
+                  elevation: 4,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Padding(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.brown.withOpacity(0.2)),
+                    ),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,14 +231,21 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildSectionTitle('Preferences', isRequired: false),
+                              child: _buildSectionTitle('Coffee Preferences', isRequired: false),
                             ),
-                            Text(
-                              'You may fill this up later!',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                                fontStyle: FontStyle.italic,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.brown[100],
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'Optional',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.brown[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -222,11 +288,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 ),
                 const SizedBox(height: 24),
                 Card(
-                  elevation: 2,
+                  elevation: 4,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Padding(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.brown.withOpacity(0.2)),
+                    ),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,12 +306,19 @@ class _RegistrationFormState extends State<RegistrationForm> {
                             Expanded(
                               child: _buildSectionTitle('Additional Information', isRequired: false),
                             ),
-                            Text(
-                              'Optional',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                                fontStyle: FontStyle.italic,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.brown[100],
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'Optional',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.brown[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -249,30 +326,81 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         const SizedBox(height: 16),
                         TextFormField(
                           maxLines: 3,
-                          decoration: _buildInputDecoration('Special Preferences / Allergies', Icons.note),
+                          decoration: _buildInputDecoration(
+                            'Special Preferences / Allergies',
+                            Icons.note,
+                            hintText: 'Tell us about any dietary restrictions or preferences',
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                CheckboxListTile(
-                  title: const Text(
-                    'I accept the terms and conditions',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  subtitle: const Text(
-                    'By checking this box, you agree to our Terms of Service and Privacy Policy',
-                    style: TextStyle(fontSize: 12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: !_acceptTerms && _showValidationErrors
+                            ? Colors.red[400]!
+                            : Colors.brown.withOpacity(0.2),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CheckboxListTile(
+                          title: const Text(
+                            'I accept the terms and conditions',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.brown,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'By checking this box, you agree to our Terms of Service and Privacy Policy',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.brown[600],
+                                ),
+                              ),
+                              if (!_acceptTerms && _showValidationErrors) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Please accept the terms and conditions to continue',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.red[400],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          value: _acceptTerms,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _acceptTerms = value ?? false;
+                              if (_acceptTerms) {
+                                _showValidationErrors = false;
+                              }
+                            });
+                          },
+                          activeColor: Colors.brown[700],
+                          checkColor: Colors.white,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ],
+                    ),
                   ),
-                  value: _acceptTerms,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _acceptTerms = value ?? false;
-                    });
-                  },
-                  activeColor: Colors.brown,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
               ],
             ),
@@ -282,49 +410,53 @@ class _RegistrationFormState extends State<RegistrationForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
+                OutlinedButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  style: ElevatedButton.styleFrom(
+                  style: OutlinedButton.styleFrom(
                     minimumSize: const Size(120, 45),
-                    backgroundColor: Colors.red[400],
-                    foregroundColor: Colors.white,
+                    side: BorderSide(color: Colors.brown[700]!),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Back'),
+                  child: Text(
+                    'Back',
+                    style: TextStyle(
+                      color: Colors.brown[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      if (!_acceptTerms) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please accept the terms and conditions'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
+                    setState(() {
+                      _showValidationErrors = true;
+                    });
+                    if (_formKey.currentState!.validate() && _acceptTerms) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Registration Submitted!'),
-                          backgroundColor: Colors.green,
+                        SnackBar(
+                          content: const Text('Registration Submitted Successfully!'),
+                          backgroundColor: Colors.green[600],
                         ),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(120, 45),
-                    backgroundColor: Colors.green[400],
+                    backgroundColor: Colors.brown[700],
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Submit'),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -339,20 +471,18 @@ class _RegistrationFormState extends State<RegistrationForm> {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.brown,
+            color: Colors.brown[700],
           ),
         ),
         if (isRequired) ...[
           const SizedBox(width: 4),
-          const Text(
-            '*',
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 20,
-            ),
+          Icon(
+            Icons.star,
+            size: 12,
+            color: Colors.red[400],
           ),
         ],
       ],
@@ -364,29 +494,34 @@ class _RegistrationFormState extends State<RegistrationForm> {
       labelText: label,
       hintText: hintText,
       hintStyle: TextStyle(
-        color: Colors.grey.withOpacity(0.5),
+        color: Colors.grey.withOpacity(0.6),
+        fontSize: 14,
       ),
-      prefixIcon: Icon(icon, color: Colors.brown),
+      prefixIcon: Icon(icon, color: Colors.brown[600]),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       filled: true,
       fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Colors.brown[200]!),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.brown, width: 2),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.brown[700]!, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Colors.red[400]!),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Colors.red[400]!, width: 2),
+      ),
+      labelStyle: TextStyle(
+        color: Colors.brown[600],
+        fontWeight: FontWeight.w500,
       ),
     );
   }

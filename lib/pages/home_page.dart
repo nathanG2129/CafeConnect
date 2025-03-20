@@ -87,6 +87,44 @@ class TitleSection extends StatelessWidget {
 class FeaturedDrinksSection extends StatelessWidget {
   const FeaturedDrinksSection({super.key});
 
+  final List<Map<String, dynamic>> featuredDrinks = const [
+    {
+      'name': 'Caramel Macchiato',
+      'image': 'assets/coffees/macchiato.jpg',
+      'price': '\$4.99',
+    },
+    {
+      'name': 'Mocha',
+      'image': 'assets/coffees/mocha.jpg',
+      'price': '\$4.49',
+    },
+    {
+      'name': 'Cold Brew',
+      'image': 'assets/coffees/coldbrew.jpg',
+      'price': '\$3.99',
+    },
+    {
+      'name': 'Americano',
+      'image': 'assets/coffees/americano.jpg',
+      'price': '\$3.49',
+    },
+    {
+      'name': 'Latte',
+      'image': 'assets/coffees/latte.jpg',
+      'price': '\$4.29',
+    },
+    {
+      'name': 'Cappuccino',
+      'image': 'assets/coffees/capuccino.jpg',
+      'price': '\$4.49',
+    },
+    {
+      'name': 'Espresso',
+      'image': 'assets/coffees/expresso.jpg',
+      'price': '\$2.99',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -105,27 +143,19 @@ class FeaturedDrinksSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 200,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
+          height: 220, // Height for the cards
+          child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildFeaturedDrinkCard(
-                'Caramel Macchiato',
-                'assets/coffee.jpg',
-                '\$4.99',
-              ),
-              _buildFeaturedDrinkCard(
-                'Vanilla Latte',
-                'assets/coffee2.jpg',
-                '\$4.49',
-              ),
-              _buildFeaturedDrinkCard(
-                'Cold Brew',
-                'assets/coffee3.jpg',
-                '\$3.99',
-              ),
-            ],
+            scrollDirection: Axis.horizontal,
+            itemCount: featuredDrinks.length,
+            itemBuilder: (context, index) {
+              final drink = featuredDrinks[index];
+              return _buildFeaturedDrinkCard(
+                drink['name'],
+                drink['image'],
+                drink['price'],
+              );
+            },
           ),
         ),
       ],
