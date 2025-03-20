@@ -143,10 +143,11 @@ class FeaturedDrinksSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 220, // Height for the cards
+          height: 220,
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: featuredDrinks.length,
             itemBuilder: (context, index) {
               final drink = featuredDrinks[index];
@@ -191,7 +192,7 @@ class FeaturedDrinksSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
