@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../pages/home_page.dart';
 import '../pages/registration_page.dart';
 import '../pages/order_menu.dart';
 import '../pages/coffee_guide.dart';
@@ -72,6 +73,12 @@ class DrawerListView extends StatelessWidget {
           title: const Text('Home'),
           onTap: () {
             Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomePage(),
+              ),
+            );
           },
         ),
         ListTile(

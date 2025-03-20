@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/app_drawer.dart';
 
 class OrderMenuPage extends StatelessWidget {
   const OrderMenuPage({super.key});
@@ -10,10 +11,10 @@ class OrderMenuPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Order Menu"),
         centerTitle: true,
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
       ),
+      drawer: const AppDrawer(),
       body: const SingleChildScrollView(
         child: Column(
           children: [
