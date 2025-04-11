@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_activity1/models/userModel.dart';
 // import '../models/userModel.dart';
 import '../widgets/app_drawer.dart';
+import '../services/auth_service.dart';
 
 class RegistrationPage extends StatelessWidget {
   const RegistrationPage({super.key});
@@ -93,11 +94,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _specialPreferencesController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   String? _selectedCoffeeType;
   String? _selectedVisitTime;
   bool _acceptTerms = false;
   bool _showValidationErrors = false;
   UserModel? _currentUser;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
 
   final _emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   final _phoneRegex = RegExp(r'^\+?[0-9\s\-\(\)\.]{8,}$');
@@ -125,6 +130,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
     _emailController.dispose();
     _phoneController.dispose();
     _specialPreferencesController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -185,6 +192,44 @@ class _RegistrationFormState extends State<RegistrationForm> {
                             }
                             if (!_emailRegex.hasMatch(value)) {
                               return 'Please enter a valid email address';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passwordController,
+                          decoration: _buildInputDecoration(
+                            'Password',
+                            Icons.lock,
+                            hintText: 'Enter your password',
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a password';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _confirmPasswordController,
+                          decoration: _buildInputDecoration(
+                            'Confirm Password',
+                            Icons.lock_outline,
+                            hintText: 'Confirm your password',
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm your password';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Passwords do not match';
                             }
                             return null;
                           },
@@ -419,7 +464,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 OutlinedButton(
-                  onPressed: () {
+                  onPressed: _isLoading ? null : () {
                     Navigator.pop(context);
                   },
                   style: OutlinedButton.styleFrom(
@@ -438,29 +483,69 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: _isLoading ? null : () async {
                     setState(() {
                       _showValidationErrors = true;
                     });
                     if (_formKey.currentState!.validate() && _acceptTerms) {
                       setState(() {
-                        _currentUser = UserModel(
-                          name: _fullNameController.text,
-                          email: _emailController.text,
-                          phoneNumber: _phoneController.text,
-                          favoriteCoffee: _selectedCoffeeType,
-                          preferredVisitTime: _selectedVisitTime,
-                          specialPreferences: _specialPreferencesController.text.isNotEmpty 
-                              ? _specialPreferencesController.text 
-                              : null,
-                        );
+                        _isLoading = true;
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Registration Submitted Successfully!'),
-                          backgroundColor: Colors.green[600],
-                        ),
+                      
+                      final newUser = UserModel(
+                        name: _fullNameController.text,
+                        email: _emailController.text,
+                        phoneNumber: _phoneController.text,
+                        favoriteCoffee: _selectedCoffeeType,
+                        preferredVisitTime: _selectedVisitTime,
+                        specialPreferences: _specialPreferencesController.text.isNotEmpty 
+                            ? _specialPreferencesController.text 
+                            : null,
                       );
+                      
+                      try {
+                        final result = await _authService.registerUser(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          userModel: newUser,
+                        );
+                        
+                        if (result != null) {
+                          setState(() {
+                            _currentUser = result;
+                            _isLoading = false;
+                          });
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Registration Successful! User data saved to Firebase.'),
+                              backgroundColor: Colors.green[600],
+                            ),
+                          );
+                        } else {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Registration Failed. Please try again.'),
+                              backgroundColor: Colors.red[600],
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error: ${e.toString()}'),
+                            backgroundColor: Colors.red[600],
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -471,12 +556,21 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: _isLoading 
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Submit',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ],
             ),
