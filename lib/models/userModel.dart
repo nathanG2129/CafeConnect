@@ -17,6 +17,31 @@ class UserModel {
     this.specialPreferences,
   });
 
+  // Update personal information
+  void updatePersonalInfo({
+    String? name,
+    String? email,
+    String? phoneNumber,
+  }) {
+    this.name = name ?? this.name;
+    this.email = email ?? this.email;
+    this.phoneNumber = phoneNumber ?? this.phoneNumber;
+  }
+
+  // Update coffee preferences
+  void updateCoffeePreferences({
+    String? favoriteCoffee,
+    String? preferredVisitTime,
+  }) {
+    this.favoriteCoffee = favoriteCoffee ?? this.favoriteCoffee;
+    this.preferredVisitTime = preferredVisitTime ?? this.preferredVisitTime;
+  }
+
+  // Update special preferences
+  void updateSpecialPreferences(String? specialPreferences) {
+    this.specialPreferences = specialPreferences;
+  }
+
   // Convert UserModel to Map for Firestore
   Map<String, dynamic> toMap() {
     return {
