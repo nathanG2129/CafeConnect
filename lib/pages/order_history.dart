@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderModel.dart';
 import 'package:flutter_activity1/services/order_service.dart';
+import 'package:flutter_activity1/models/cartModel.dart';
 import 'package:intl/intl.dart';
 import '../widgets/app_drawer.dart';
 
@@ -324,12 +325,18 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   }
 
   void _reorderItem(OrderModel order) {
+    // Add item to cart before navigating
+    final cartModel = CartModel();
+    cartModel.loadFromStorage();
+    cartModel.addItem(order);
+    
+    // Navigate to menu page
     Navigator.pushReplacementNamed(context, '/menu');
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Reordering ${order.coffeeName}...'),
-        backgroundColor: Colors.brown[600],
+        content: Text('${order.coffeeName} added to cart'),
+        backgroundColor: Colors.green[600],
       ),
     );
   }
