@@ -1,70 +1,85 @@
 import 'package:flutter/material.dart';
-import '../pages/home_page.dart';
-import '../pages/registration_page.dart';
-import '../pages/login_page.dart';
-import '../pages/profile_page.dart';
-import '../pages/order_menu.dart';
-import '../pages/coffee_guide.dart';
-import '../pages/about_page.dart';
 import '../services/auth_service.dart';
 
-class AppDrawer extends StatefulWidget {
+class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   @override
-  State<AppDrawer> createState() => _AppDrawerState();
-}
-
-class _AppDrawerState extends State<AppDrawer> {
-  final AuthService _authService = AuthService();
-  bool _isLoggedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkLoginStatus();
-  }
-
-  void _checkLoginStatus() {
-    setState(() {
-      _isLoggedIn = _authService.isUserLoggedIn();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
+    final bool isLoggedIn = _authService.isUserLoggedIn();
+
     return Drawer(
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
         children: [
-          const DrawerHeaderWidget(),
+          _buildDrawerHeader(context, isLoggedIn),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                DrawerListView(
-                  isLoggedIn: _isLoggedIn,
-                  onLogout: () {
-                    _authService.signOut().then((_) {
-                      setState(() {
-                        _isLoggedIn = false;
-                      });
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.home,
+                  title: 'Home',
+                  onTap: () => Navigator.pushReplacementNamed(context, '/home'),
+                ),
+                if (isLoggedIn)
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.person,
+                    title: 'Profile',
+                    onTap: () => Navigator.pushReplacementNamed(context, '/profile'),
+                  ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.coffee,
+                  title: 'Order Menu',
+                  onTap: () => Navigator.pushReplacementNamed(context, '/menu'),
+                ),
+                if (isLoggedIn)
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.receipt_long,
+                    title: 'Order History',
+                    onTap: () => Navigator.pushReplacementNamed(context, '/order-history'),
+                  ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.menu_book,
+                  title: 'Coffee Guide',
+                  onTap: () => Navigator.pushReplacementNamed(context, '/guide'),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.info,
+                  title: 'About Us',
+                  onTap: () => Navigator.pushReplacementNamed(context, '/about'),
+                ),
+                const Divider(),
+                if (isLoggedIn)
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.logout,
+                    title: 'Sign Out',
+                    onTap: () async {
+                      await _authService.signOut();
+                      Navigator.pushReplacementNamed(context, '/home');
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('You have been logged out successfully'),
+                          content: Text('You have been signed out'),
                           backgroundColor: Colors.brown,
                         ),
                       );
-                      // Navigate to home page after logout
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ),
-                      );
-                    });
-                  },
-                ),
+                    },
+                  )
+                else
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.login,
+                    title: 'Sign In',
+                    onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                  ),
               ],
             ),
           ),
@@ -73,194 +88,72 @@ class _AppDrawerState extends State<AppDrawer> {
       ),
     );
   }
-}
 
-class DrawerHeaderWidget extends StatelessWidget {
-  const DrawerHeaderWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 24,
-        bottom: 24,
-        left: 24,
-        right: 24,
-      ),
+  Widget _buildDrawerHeader(BuildContext context, bool isLoggedIn) {
+    return DrawerHeader(
       decoration: BoxDecoration(
         color: Colors.brown[700],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: Icon(Icons.coffee, size: 32, color: Colors.brown[700]),
-          ),
-          const SizedBox(height: 16),
           const Text(
-            'CafeConnect',
+            'Cafe Connect',
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            'Your Perfect Coffee Destination',
+            'Your Coffee Destination',
             style: TextStyle(
               color: Colors.brown[100],
-              fontSize: 12,
+              fontSize: 16,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class DrawerListView extends StatelessWidget {
-  final bool isLoggedIn;
-  final VoidCallback onLogout;
-
-  const DrawerListView({
-    super.key,
-    required this.isLoggedIn,
-    required this.onLogout,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 8),
-        ListTile(
-          leading: const Icon(Icons.home, color: Colors.brown),
-          title: const Text('Home'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomePage(),
+          const Spacer(),
+          if (isLoggedIn)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
               ),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.coffee, color: Colors.brown),
-          title: const Text('Order Menu'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const OrderMenuPage(),
-              ),
-            );
-          },
-        ),
-        const Divider(height: 1),
-        if (isLoggedIn) ...[
-          ListTile(
-            leading: const Icon(Icons.person, color: Colors.brown),
-            title: const Text('My Profile'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.brown),
-            title: const Text('Logout'),
-            onTap: () {
-              Navigator.pop(context);
-              onLogout();
-            },
-          ),
-        ] else ...[
-          ListTile(
-            leading: const Icon(Icons.login, color: Colors.brown),
-            title: const Text('Login'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginPage(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.app_registration, color: Colors.brown),
-            title: const Text('Join Membership'),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.brown[100],
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.brown[600],
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                'FREE',
+              child: const Text(
+                'Logged In',
                 style: TextStyle(
-                  color: Colors.brown[700],
+                  color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const RegistrationPage(),
-                ),
-              );
-            },
-          ),
         ],
-        const Divider(height: 1),
-        ListTile(
-          leading: const Icon(Icons.menu_book, color: Colors.brown),
-          title: const Text('Coffee Guide'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CoffeeGuidePage(),
-              ),
-            );
-          },
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.brown[700]),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: Colors.brown[800],
+          fontWeight: FontWeight.w500,
         ),
-        ListTile(
-          leading: const Icon(Icons.info, color: Colors.brown),
-          title: const Text('About'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AboutPage(),
-              ),
-            );
-          },
-        ),
-      ],
+      ),
+      onTap: onTap,
     );
   }
 }

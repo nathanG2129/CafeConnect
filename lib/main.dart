@@ -4,6 +4,7 @@ import 'pages/login_page.dart';
 import 'pages/registration_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/order_menu.dart';
+import 'pages/order_history.dart';
 import 'pages/coffee_guide.dart';
 import 'pages/about_page.dart';
 import 'package:get_storage/get_storage.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegistrationPage(),
         '/profile': (context) => const ProfilePage(),
         '/menu': (context) => const OrderMenuPage(),
+        '/order-history': (context) => const OrderHistoryPage(),
         '/guide': (context) => const CoffeeGuidePage(),
         '/about': (context) => const AboutPage(),
       },
