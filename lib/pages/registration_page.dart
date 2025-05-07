@@ -4,6 +4,7 @@ import 'package:flutter_activity1/models/userModel.dart';
 // import '../models/userModel.dart';
 import '../widgets/app_drawer.dart';
 import '../services/auth_service.dart';
+import 'home_page.dart';
 
 class RegistrationPage extends StatelessWidget {
   const RegistrationPage({super.key});
@@ -100,7 +101,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
   String? _selectedVisitTime;
   bool _acceptTerms = false;
   bool _showValidationErrors = false;
-  UserModel? _currentUser;
   bool _isLoading = false;
   final AuthService _authService = AuthService();
 
@@ -141,7 +141,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
       key: _formKey,
       child: Column(
         children: [
-          if (_currentUser != null) _buildUserDetailsCard(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -510,23 +509,24 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           userModel: newUser,
                         );
                         
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        
                         if (result != null) {
-                          setState(() {
-                            _currentUser = result;
-                            _isLoading = false;
-                          });
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomePage()),
+                          );
                           
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Registration Successful! User data saved to Firebase.'),
+                              content: const Text('Registration Successful! Welcome to CafeConnect.'),
                               backgroundColor: Colors.green[600],
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         } else {
-                          setState(() {
-                            _isLoading = false;
-                          });
-                          
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: const Text('Registration Failed. Please try again.'),
@@ -636,153 +636,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
       labelStyle: TextStyle(
         color: Colors.brown[600],
         fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  Widget _buildUserDetailsCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.brown.withOpacity(0.2)),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'User Details',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.brown[700],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        color: Colors.brown[700],
-                        onPressed: _editUserDetails,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        color: Colors.red[400],
-                        onPressed: _deleteUserDetails,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow('Name', _currentUser?.name ?? ''),
-              _buildDetailRow('Email', _currentUser?.email ?? ''),
-              _buildDetailRow('Phone', _currentUser?.phoneNumber ?? ''),
-              if (_currentUser?.favoriteCoffee != null)
-                _buildDetailRow('Favorite Coffee', _currentUser!.favoriteCoffee!),
-              if (_currentUser?.preferredVisitTime != null)
-                _buildDetailRow('Preferred Visit Time', _currentUser!.preferredVisitTime!),
-              if (_currentUser?.specialPreferences != null)
-                _buildDetailRow('Special Preferences', _currentUser!.specialPreferences!),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.brown[700],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.brown[900],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _editUserDetails() {
-    if (_currentUser != null) {
-      _fullNameController.text = _currentUser!.name ?? '';
-      _emailController.text = _currentUser!.email ?? '';
-      _phoneController.text = _currentUser!.phoneNumber ?? '';
-      _specialPreferencesController.text = _currentUser!.specialPreferences ?? '';
-      setState(() {
-        _selectedCoffeeType = _currentUser!.favoriteCoffee;
-        _selectedVisitTime = _currentUser!.preferredVisitTime;
-      });
-    }
-  }
-
-  void _deleteUserDetails() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete User Details'),
-        content: const Text('Are you sure you want to delete your user details?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.brown[700]),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _currentUser = null;
-                _fullNameController.clear();
-                _emailController.clear();
-                _phoneController.clear();
-                _specialPreferencesController.clear();
-                _selectedCoffeeType = null;
-                _selectedVisitTime = null;
-                _acceptTerms = false;
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('User details deleted successfully'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
       ),
     );
   }
