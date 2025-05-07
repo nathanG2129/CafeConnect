@@ -133,8 +133,8 @@ class DrawerHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService _authService = AuthService();
-    final bool isLoggedIn = _authService.isUserLoggedIn();
+    final AuthService authService = AuthService();
+    final bool isLoggedIn = authService.isUserLoggedIn();
     
     return Container(
       width: double.infinity,
@@ -187,7 +187,7 @@ class DrawerHeaderWidget extends StatelessWidget {
                 color: Colors.brown[600],
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
+              child: const Text(
                 'Logged In',
                 style: TextStyle(
                   color: Colors.white,
