@@ -1,19 +1,36 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final AuthService _authService = AuthService();
-    final bool isLoggedIn = _authService.isUserLoggedIn();
+  State<AppDrawer> createState() => _AppDrawerState();
+}
 
+class _AppDrawerState extends State<AppDrawer> {
+  final AuthService _authService = AuthService();
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() {
+    setState(() {
+      _isLoggedIn = _authService.isUserLoggedIn();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
         children: [
-          _buildDrawerHeader(context, isLoggedIn),
+          const DrawerHeaderWidget(),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -24,7 +41,7 @@ class AppDrawer extends StatelessWidget {
                   title: 'Home',
                   onTap: () => Navigator.pushReplacementNamed(context, '/home'),
                 ),
-                if (isLoggedIn)
+                if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
                     icon: Icons.person,
@@ -37,7 +54,7 @@ class AppDrawer extends StatelessWidget {
                   title: 'Order Menu',
                   onTap: () => Navigator.pushReplacementNamed(context, '/menu'),
                 ),
-                if (isLoggedIn)
+                if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
                     icon: Icons.receipt_long,
@@ -56,21 +73,24 @@ class AppDrawer extends StatelessWidget {
                   title: 'About Us',
                   onTap: () => Navigator.pushReplacementNamed(context, '/about'),
                 ),
-                const Divider(),
-                if (isLoggedIn)
+                const Divider(height: 1),
+                if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
                     icon: Icons.logout,
                     title: 'Sign Out',
                     onTap: () async {
                       await _authService.signOut();
-                      Navigator.pushReplacementNamed(context, '/home');
+                      setState(() {
+                        _isLoggedIn = false;
+                      });
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('You have been signed out'),
                           backgroundColor: Colors.brown,
                         ),
                       );
+                      Navigator.pushReplacementNamed(context, '/home');
                     },
                   )
                 else
@@ -89,14 +109,57 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerHeader(BuildContext context, bool isLoggedIn) {
-    return DrawerHeader(
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.brown),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.brown,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+class DrawerHeaderWidget extends StatelessWidget {
+  const DrawerHeaderWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
+    final bool isLoggedIn = _authService.isUserLoggedIn();
+    
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 24,
+        bottom: 24,
+        left: 24,
+        right: 24,
+      ),
       decoration: BoxDecoration(
         color: Colors.brown[700],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(Icons.coffee, size: 32, color: Colors.brown[700]),
+          ),
+          const SizedBox(height: 16),
           const Text(
             'Cafe Connect',
             style: TextStyle(
@@ -105,16 +168,16 @@ class AppDrawer extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             'Your Coffee Destination',
             style: TextStyle(
               color: Colors.brown[100],
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
-          const Spacer(),
-          if (isLoggedIn)
+          if (isLoggedIn) ...[
+            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -124,7 +187,7 @@ class AppDrawer extends StatelessWidget {
                 color: Colors.brown[600],
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Text(
+              child: Text(
                 'Logged In',
                 style: TextStyle(
                   color: Colors.white,
@@ -133,27 +196,9 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
             ),
+          ],
         ],
       ),
-    );
-  }
-
-  Widget _buildDrawerItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.brown[700]),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: Colors.brown[800],
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      onTap: onTap,
     );
   }
 }
