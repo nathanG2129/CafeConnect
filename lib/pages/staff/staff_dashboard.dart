@@ -200,7 +200,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                   title: "Products",
                   color: Colors.amber[700]!,
                   onTap: () {
-                    Navigator.pushNamed(context, '/manage-products');
+                    Navigator.pushReplacementNamed(context, '/manage-products');
                   },
                 ),
               ],

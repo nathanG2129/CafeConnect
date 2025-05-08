@@ -162,7 +162,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => Navigator.pushReplacementNamed(context, '/menu'),
+            onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.coffee),
             label: const Text('Browse Menu'),
             style: ElevatedButton.styleFrom(
@@ -333,7 +333,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     cartModel.addItem(order);
     
     // Navigate to menu page
-    Navigator.pushReplacementNamed(context, '/menu');
+    Navigator.pop(context);
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
