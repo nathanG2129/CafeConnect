@@ -419,8 +419,12 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     cartModel.loadFromStorage();
     cartModel.addItem(order);
     
-    // Navigate to menu page
-    Navigator.pop(context);
+    // Navigate to menu page with a flag to open the cart
+    Navigator.pushReplacementNamed(
+      context, 
+      '/menu',
+      arguments: {'openCart': true}
+    );
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

@@ -25,7 +25,6 @@ class OrderService {
 
       return true;
     } catch (e) {
-      // print('Error saving order: ${e.toString()}');
       return false;
     }
   }
@@ -42,16 +41,19 @@ class OrderService {
       QuerySnapshot querySnapshot = await _firestore
           .collection('orders')
           .where('userId', isEqualTo: currentUser.uid)
-          .orderBy('orderDate', descending: true)
           .get();
 
-      // Convert QuerySnapshot to List<OrderModel>
-      return querySnapshot.docs.map((doc) {
+      // Convert QuerySnapshot to List<OrderModel> and sort manually
+      List<OrderModel> orders = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         return OrderModel.fromMap(data);
       }).toList();
+      
+      // Sort by orderDate manually (most recent first)
+      orders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
+      
+      return orders;
     } catch (e) {
-      // print('Error getting orders: ${e.toString()}');
       return [];
     }
   }
@@ -87,7 +89,6 @@ class OrderService {
 
       return true;
     } catch (e) {
-      // print('Error deleting order: ${e.toString()}');
       return false;
     }
   }
@@ -109,7 +110,6 @@ class OrderService {
         return OrderModel.fromMap(data);
       }).toList();
     } catch (e) {
-      // print('Error getting all orders: ${e.toString()}');
       return [];
     }
   }
@@ -128,7 +128,6 @@ class OrderService {
         return OrderModel.fromMap(data);
       }).toList();
     } catch (e) {
-      // print('Error getting orders by status: ${e.toString()}');
       return [];
     }
   }
@@ -144,7 +143,6 @@ class OrderService {
       
       return true;
     } catch (e) {
-      // print('Error updating order status: ${e.toString()}');
       return false;
     }
   }

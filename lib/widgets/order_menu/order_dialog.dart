@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderModel.dart';
 import 'package:flutter_activity1/models/product_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 
 class OrderDialog extends StatefulWidget {
@@ -59,6 +60,9 @@ class _OrderDialogState extends State<OrderDialog> {
 
     // Generate a unique order ID
     final String orderId = 'order_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}';
+    
+    // Get current user ID or default to empty string
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     // Create an OrderModel
     final OrderModel order = OrderModel(
@@ -71,7 +75,7 @@ class _OrderDialogState extends State<OrderDialog> {
       totalPrice: totalPrice,
       imagePath: widget.product.imagePath,
       orderDate: DateTime.now(),
-      userId: '', // Empty string as placeholder; will be set by OrderService
+      userId: userId, // Use the current user's ID
     );
 
     // Add to cart

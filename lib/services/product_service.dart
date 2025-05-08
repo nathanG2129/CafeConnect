@@ -18,7 +18,6 @@ class ProductService {
         return ProductModel.fromMap(data);
       }).toList();
     } catch (e) {
-      print('Error getting products: ${e.toString()}');
       return [];
     }
   }
@@ -37,7 +36,6 @@ class ProductService {
         return ProductModel.fromMap(data);
       }).toList();
     } catch (e) {
-      print('Error getting available products: ${e.toString()}');
       return [];
     }
   }
@@ -55,7 +53,6 @@ class ProductService {
       }
       return null;
     } catch (e) {
-      print('Error getting product: ${e.toString()}');
       return null;
     }
   }
@@ -79,7 +76,6 @@ class ProductService {
       await docRef.set(newProduct.toMap());
       return true;
     } catch (e) {
-      print('Error adding product: ${e.toString()}');
       return false;
     }
   }
@@ -103,7 +99,6 @@ class ProductService {
           .update(updatedProduct.toMap());
       return true;
     } catch (e) {
-      print('Error updating product: ${e.toString()}');
       return false;
     }
   }
@@ -120,7 +115,6 @@ class ProductService {
       });
       return true;
     } catch (e) {
-      print('Error toggling product availability: ${e.toString()}');
       return false;
     }
   }
@@ -134,7 +128,6 @@ class ProductService {
           .delete();
       return true;
     } catch (e) {
-      print('Error deleting product: ${e.toString()}');
       return false;
     }
   }

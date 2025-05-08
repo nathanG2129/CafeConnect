@@ -28,21 +28,26 @@ class _MenuGridSectionState extends State<MenuGridSection> {
   }
 
   Future<void> _loadProducts() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
 
     try {
       final products = await _productService.getAvailableProducts();
-      setState(() {
-        _products = products;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _products = products;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _products = _getFallbackProducts(); // Use fallback if Firebase fails
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _products = _getFallbackProducts(); // Use fallback if Firebase fails
+        });
+      }
     }
   }
 

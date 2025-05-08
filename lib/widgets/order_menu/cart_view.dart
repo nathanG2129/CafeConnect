@@ -459,7 +459,7 @@ class _CartViewState extends State<CartView> {
       );
       return;
     }
-
+    
     setState(() {
       _isProcessing = true;
     });
@@ -469,7 +469,12 @@ class _CartViewState extends State<CartView> {
       bool allSuccessful = true;
       
       for (var item in widget.cart.items) {
-        bool success = await _orderService.saveOrder(item);
+        // Ensure all items have the current user's ID
+        final updatedItem = item.userId.isEmpty 
+            ? item.copyWith(userId: currentUser.uid)
+            : item;
+        
+        bool success = await _orderService.saveOrder(updatedItem);
         if (!success) {
           allSuccessful = false;
         }
@@ -484,12 +489,24 @@ class _CartViewState extends State<CartView> {
         widget.cart.clearCart();
         widget.onUpdate();
         
+        // First close the cart view
+        widget.onClose();
+        
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Order placed successfully!'),
             backgroundColor: Colors.green[600],
+            duration: const Duration(seconds: 2),
           ),
         );
+        
+        // Navigate to order history page after a short delay
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.pushNamed(context, '/order-history');
+          }
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

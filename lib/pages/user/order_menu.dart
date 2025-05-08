@@ -23,6 +23,19 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
     _loadCart();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Check if we should open the cart automatically (from order history reorder)
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args['openCart'] == true) {
+      setState(() {
+        _isCartOpen = true;
+      });
+    }
+  }
+
   void _loadCart() {
     _cart.loadFromStorage();
     setState(() {});
