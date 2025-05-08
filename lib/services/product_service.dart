@@ -15,9 +15,12 @@ class ProductService {
 
       return querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        // Ensure the document ID is included in the data
+        data['id'] = doc.id;
         return ProductModel.fromMap(data);
       }).toList();
     } catch (e) {
+      // Log the error for debugging
       return [];
     }
   }
@@ -33,9 +36,12 @@ class ProductService {
 
       return querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        // Ensure the document ID is included in the data
+        data['id'] = doc.id;
         return ProductModel.fromMap(data);
       }).toList();
     } catch (e) {
+      // Log the error for debugging
       return [];
     }
   }
@@ -49,7 +55,10 @@ class ProductService {
           .get();
 
       if (doc.exists) {
-        return ProductModel.fromMap(doc.data() as Map<String, dynamic>);
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        // Ensure the document ID is included in the data
+        data['id'] = doc.id;
+        return ProductModel.fromMap(data);
       }
       return null;
     } catch (e) {

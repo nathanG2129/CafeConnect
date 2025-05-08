@@ -31,6 +31,12 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
 
     try {
       final products = await _productService.getAllProducts();
+      
+      if (products.isEmpty) {
+      } else {
+        // Log first product to check data structure
+      }
+      
       if (!mounted) return;
       setState(() {
         _products = products;
@@ -45,6 +51,12 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
         SnackBar(
           content: Text('Error loading products: ${e.toString()}'),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'RETRY',
+            onPressed: _loadProducts,
+            textColor: Colors.white,
+          ),
         ),
       );
     }

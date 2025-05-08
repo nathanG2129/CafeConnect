@@ -233,10 +233,10 @@ class _EditProductPageState extends State<EditProductPage> {
             TextFormField(
               controller: _basePriceController,
               decoration: const InputDecoration(
-                labelText: 'Base Price (\$)',
-                hintText: 'e.g., 3.99',
+                labelText: 'Base Price (₱)',
+                hintText: 'e.g., 99.00',
                 border: OutlineInputBorder(),
-                prefixText: '\$ ',
+                prefixText: '₱ ',
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
@@ -340,7 +340,7 @@ class _EditProductPageState extends State<EditProductPage> {
                 decoration: const InputDecoration(
                   labelText: 'Extra Price',
                   border: OutlineInputBorder(),
-                  prefixText: '\$ ',
+                  prefixText: '₱ ',
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
@@ -443,7 +443,7 @@ class _EditProductPageState extends State<EditProductPage> {
                 decoration: const InputDecoration(
                   labelText: 'Price',
                   border: OutlineInputBorder(),
-                  prefixText: '\$ ',
+                  prefixText: '₱ ',
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [

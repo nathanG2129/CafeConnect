@@ -345,6 +345,17 @@ class AppDrawerState extends State<AppDrawer> {
                       Navigator.pushReplacementNamed(context, '/manage-orders');
                     },
                   ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.price_change,
+                    customIcon: '💰',
+                    title: 'Update Menu Pricing',
+                    index: 7,
+                    route: '/update-pricing',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/update-pricing');
+                    },
+                  ),
                 ] else ...[
                   _buildDrawerItem(
                     context,
