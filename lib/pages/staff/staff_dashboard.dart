@@ -194,22 +194,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                         Navigator.pushReplacementNamed(context, '/manage-orders');
                       },
                     ),
-                    _buildQuickAccessItem(
-                      icon: Icons.local_offer,
-                      title: "Specials",
-                      color: Colors.orange[600]!,
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, '/manage-specials');
-                      },
-                    ),
-                    _buildQuickAccessItem(
-                      icon: Icons.campaign,
-                      title: "Promotions",
-                      color: Colors.purple[600]!,
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, '/manage-promotions');
-                      },
-                    ),
                   ],
                 );
               }
