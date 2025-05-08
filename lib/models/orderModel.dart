@@ -8,6 +8,8 @@ class OrderModel {
   final double totalPrice;
   final String imagePath;
   final DateTime orderDate;
+  final String status;
+  final String userId;
 
   OrderModel({
     required this.id,
@@ -19,6 +21,8 @@ class OrderModel {
     required this.totalPrice,
     required this.imagePath,
     required this.orderDate,
+    this.status = 'Pending',
+    required this.userId,
   });
 
   // Create a copy of the order with updated properties
@@ -32,6 +36,8 @@ class OrderModel {
     double? totalPrice,
     String? imagePath,
     DateTime? orderDate,
+    String? status,
+    String? userId,
   }) {
     return OrderModel(
       id: id ?? this.id,
@@ -43,6 +49,8 @@ class OrderModel {
       totalPrice: totalPrice ?? this.totalPrice,
       imagePath: imagePath ?? this.imagePath,
       orderDate: orderDate ?? this.orderDate,
+      status: status ?? this.status,
+      userId: userId ?? this.userId,
     );
   }
 
@@ -58,6 +66,8 @@ class OrderModel {
       'totalPrice': totalPrice,
       'imagePath': imagePath,
       'orderDate': orderDate.millisecondsSinceEpoch,
+      'status': status,
+      'userId': userId,
     };
   }
 
@@ -73,6 +83,8 @@ class OrderModel {
       totalPrice: map['totalPrice'],
       imagePath: map['imagePath'],
       orderDate: DateTime.fromMillisecondsSinceEpoch(map['orderDate']),
+      status: map['status'] ?? 'Pending',
+      userId: map['userId'] ?? '',
     );
   }
 } 

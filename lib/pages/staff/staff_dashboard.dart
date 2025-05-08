@@ -203,6 +203,14 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                     Navigator.pushReplacementNamed(context, '/manage-products');
                   },
                 ),
+                _buildQuickAccessItem(
+                  icon: Icons.receipt_long,
+                  title: "Orders",
+                  color: Colors.green[600]!,
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/manage-orders');
+                  },
+                ),
               ],
             ),
           ],

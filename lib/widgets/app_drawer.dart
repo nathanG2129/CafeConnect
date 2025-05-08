@@ -337,6 +337,17 @@ class AppDrawerState extends State<AppDrawer> {
                       Navigator.pushReplacementNamed(context, '/manage-products');
                     },
                   ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.receipt_long,
+                    customIcon: '📋',
+                    title: 'Manage Orders',
+                    index: 3,
+                    route: '/manage-orders',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/manage-orders');
+                    },
+                  ),
                 ] else ...[
                   _buildDrawerItem(
                     context,
@@ -453,6 +464,7 @@ class AppDrawerState extends State<AppDrawer> {
       case '/manage-products':
         return 2;
       case '/order-history':
+      case '/manage-orders':
         return 3;
       case '/guide':
         return 4;

@@ -71,6 +71,7 @@ class _OrderDialogState extends State<OrderDialog> {
       totalPrice: totalPrice,
       imagePath: widget.product.imagePath,
       orderDate: DateTime.now(),
+      userId: '', // Empty string as placeholder; will be set by OrderService
     );
 
     // Add to cart
