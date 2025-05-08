@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderItemModel.dart';
 import 'package:flutter_activity1/models/productModel.dart';
-import 'package:flutter_activity1/models/specialModel.dart';
 import 'package:flutter_activity1/services/product_service.dart';
 import 'package:flutter_activity1/services/discount_service.dart';
 import 'package:flutter_activity1/widgets/order_menu/order_dialog.dart';
@@ -229,18 +228,14 @@ class _MenuGridSectionState extends State<MenuGridSection> {
   Widget _buildProductsGrid(bool isSmallScreen, bool isMediumScreen, bool isLargeScreen) {
     // Determine number of columns based on screen size
     int crossAxisCount;
-    double childAspectRatio;
     final screenWidth = MediaQuery.of(context).size.width;
     
     if (isLargeScreen) {
       crossAxisCount = 3;
-      childAspectRatio = 0.85;
     } else if (isMediumScreen) {
       crossAxisCount = 2;
-      childAspectRatio = 0.8;
     } else {
       crossAxisCount = screenWidth < 480 ? 1 : 2;
-      childAspectRatio = screenWidth < 480 ? 1.2 : 0.75;
     }
     
     return Column(
@@ -282,27 +277,6 @@ class _MenuGridSectionState extends State<MenuGridSection> {
           }
         ),
       ],
-    );
-  }
-  
-  Widget _buildFilterChip(String label, {bool isSelected = false}) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      child: FilterChip(
-        selected: isSelected,
-        label: Text(label),
-        backgroundColor: Colors.brown[50],
-        selectedColor: Colors.brown[200],
-        checkmarkColor: Colors.brown[800],
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.brown[800] : Colors.brown[600],
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        onSelected: (selected) {
-          // Filter functionality could be implemented here
-        },
-      ),
     );
   }
   

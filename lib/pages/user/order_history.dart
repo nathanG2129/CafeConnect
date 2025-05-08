@@ -55,6 +55,10 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth >= 1100;
+    final bool isMediumScreen = screenWidth >= 768 && screenWidth < 1100;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF5E6D3),
       appBar: AppBar(
@@ -62,10 +66,12 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         centerTitle: true,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
+        elevation: 2,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadOrders,
+            tooltip: 'Refresh orders',
           ),
         ],
       ),
@@ -76,20 +82,116 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               ? _buildErrorState()
               : _orders.isEmpty
                   ? _buildEmptyState()
-                  : _buildOrderList(),
+                  : isLargeScreen
+                      ? _buildDesktopLayout()
+                      : isMediumScreen
+                          ? _buildTabletLayout()
+                          : _buildMobileLayout(),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Side panel with order dates
+          Container(
+            width: 300,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.brown.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: _buildOrderDateList(),
+          ),
+          const SizedBox(width: 24),
+          // Expanded area for order cards
+          Expanded(
+            child: _buildOrderList(isCompact: false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabletLayout() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: _buildOrderList(isCompact: false),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return _buildOrderList(isCompact: true);
+  }
+
+  Widget _buildOrderDateList() {
+    // Group orders by date
+    final Map<String, List<OrderModel>> groupedOrders = _groupOrdersByDate();
+    final List<String> dates = groupedOrders.keys.toList();
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            'Order Dates',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.brown[800],
+            ),
+          ),
+        ),
+        const Divider(),
+        Expanded(
+          child: ListView.builder(
+            itemCount: dates.length,
+            itemBuilder: (context, index) {
+              final date = dates[index];
+              final ordersCount = groupedOrders[date]!.length;
+              
+              return ListTile(
+                leading: Icon(Icons.calendar_today, color: Colors.brown[600]),
+                title: Text(date),
+                subtitle: Text('$ordersCount ${ordersCount == 1 ? 'order' : 'orders'}'),
+                trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.brown[400]),
+                onTap: () {
+                  // Scroll to this date in the main view
+                  // This would need a more complex implementation with scroll controllers
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildLoadingState() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(color: Colors.brown),
-          SizedBox(height: 16),
+          CircularProgressIndicator(color: Colors.brown[600]),
+          const SizedBox(height: 24),
           Text(
             'Loading your orders...',
-            style: TextStyle(color: Colors.brown, fontSize: 16),
+            style: TextStyle(
+              color: Colors.brown[700], 
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -101,22 +203,32 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
+          ),
+          const SizedBox(height: 24),
           Text(
             'Failed to load orders',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.brown[700],
+              color: Colors.brown[800],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Please check your connection and try again',
-            style: TextStyle(color: Colors.brown[600]),
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.brown[600],
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           ElevatedButton.icon(
             onPressed: _loadOrders,
             icon: const Icon(Icons.refresh),
@@ -124,6 +236,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.brown[700],
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -139,17 +252,24 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.receipt_long, size: 64, color: Colors.brown[300]),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.brown[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.receipt_long, size: 64, color: Colors.brown[300]),
+          ),
+          const SizedBox(height: 24),
           Text(
             'No Order History',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.brown[700],
+              color: Colors.brown[800],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
@@ -158,18 +278,19 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.brown[600],
+                height: 1.5,
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           ElevatedButton.icon(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pushReplacementNamed(context, '/menu'),
             icon: const Icon(Icons.coffee),
             label: const Text('Browse Menu'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.brown[700],
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -180,8 +301,8 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     );
   }
 
-  Widget _buildOrderList() {
-    // Group orders by date
+  // Helper method to group orders by date
+  Map<String, List<OrderModel>> _groupOrdersByDate() {
     final Map<String, List<OrderModel>> groupedOrders = {};
     
     for (var order in _orders) {
@@ -191,9 +312,16 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       }
       groupedOrders[dateStr]!.add(order);
     }
+    
+    return groupedOrders;
+  }
+
+  Widget _buildOrderList({required bool isCompact}) {
+    // Group orders by date
+    final groupedOrders = _groupOrdersByDate();
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isCompact ? 12 : 16),
       itemCount: groupedOrders.length,
       itemBuilder: (context, index) {
         final date = groupedOrders.keys.elementAt(index);
@@ -202,27 +330,56 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                date,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.brown[800],
-                ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.brown[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.brown.withOpacity(0.1)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.calendar_today, size: 18, color: Colors.brown[600]),
+                  const SizedBox(width: 8),
+                  Text(
+                    date,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown[800],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.brown[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${dateOrders.length} ${dateOrders.length == 1 ? 'order' : 'orders'}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.brown[700],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            ...dateOrders.map((order) => _buildOrderCard(order)).toList(),
-            const SizedBox(height: 8),
+            ...dateOrders.map((order) => _buildOrderCard(order, isCompact)).toList(),
+            const SizedBox(height: 16),
           ],
         );
       },
     );
   }
 
-  Widget _buildOrderCard(OrderModel order) {
+  Widget _buildOrderCard(OrderModel order, bool isCompact) {
     final timeStr = DateFormat('h:mm a').format(order.orderDate);
+    final screenWidth = MediaQuery.of(context).size.width;
     
     // Status color mapping to match manage_orders_page.dart
     Color getStatusColor(String status) {
@@ -264,8 +421,6 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     bool canCancel = order.status.toLowerCase() == 'pending' || 
                     order.status.toLowerCase() == 'preparing';
     
-    // Get a representative image for the order
-    
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
@@ -273,7 +428,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       ),
       elevation: 3,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isCompact ? 12 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -328,68 +483,20 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
             ),
             const SizedBox(height: 16),
             
-            // List of items in this order
-            ...order.items.map((item) => _buildOrderItemTile(item)).toList(),
+            // List of items in this order - use compact view for small screens
+            if (isCompact && screenWidth < 400)
+              _buildCompactItemsList(order.items)
+            else if (isCompact)
+              ...order.items.map((item) => _buildCompactOrderItemTile(item)).toList()
+            else
+              ...order.items.map((item) => _buildOrderItemTile(item)).toList(),
             
             const Divider(height: 24),
             
-            // Order summary
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Subtotal: ₱${order.subtotal.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 14, color: Colors.brown[700]),
-                ),
-                Text(
-                  '\$${order.subtotal.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown[700],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Tax: ₱${order.tax.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 14, color: Colors.brown[700]),
-                ),
-                Text(
-                  '\$${order.tax.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown[700],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '₱${order.totalAmount.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown[700],
-                  ),
-                ),
-              ],
-            ),
+            // Order summary - adapt layout based on screen size
+            screenWidth > 600
+                ? _buildWideOrderSummary(order)
+                : _buildCompactOrderSummary(order),
             
             const SizedBox(height: 16),
             Row(
@@ -429,6 +536,111 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Helper method for very small screens to show items as a simple summary
+  Widget _buildCompactItemsList(List<OrderItemModel> items) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.brown[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${items.length} ${items.length == 1 ? 'item' : 'items'}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[800],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            items.map((item) => '${item.quantity}x ${item.coffeeName}').join(', '),
+            style: TextStyle(
+              color: Colors.brown[700],
+              fontSize: 13,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build a compact order item tile for smaller screens
+  Widget _buildCompactOrderItemTile(OrderItemModel item) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          // Item image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset(
+              item.imagePath,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 8),
+          
+          // Item details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.coffeeName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  'Size: ${item.size}${item.addOn != null ? ' • ${item.addOn}' : ''}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.brown[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Item quantity and price
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${item.quantity}x',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.brown[700],
+                ),
+              ),
+              Text(
+                '₱${item.totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[700],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -498,6 +710,107 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
           ),
         ],
       ),
+    );
+  }
+
+  // Wide order summary for larger screens
+  Widget _buildWideOrderSummary(OrderModel order) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              _buildSummaryRow('Subtotal:', '₱${order.subtotal.toStringAsFixed(2)}'),
+              const SizedBox(height: 4),
+              _buildSummaryRow('Tax:', '₱${order.tax.toStringAsFixed(2)}'),
+            ],
+          ),
+        ),
+        const SizedBox(width: 24),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.brown[50],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.brown.withOpacity(0.1)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Total:',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[800],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '₱${order.totalAmount.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[700],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Compact order summary for smaller screens
+  Widget _buildCompactOrderSummary(OrderModel order) {
+    return Column(
+      children: [
+        _buildSummaryRow('Subtotal:', '₱${order.subtotal.toStringAsFixed(2)}'),
+        const SizedBox(height: 4),
+        _buildSummaryRow('Tax:', '₱${order.tax.toStringAsFixed(2)}'),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Total:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '₱${order.totalAmount.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown[700],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // Helper for building summary rows
+  Widget _buildSummaryRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, color: Colors.brown[700]),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.brown[700],
+          ),
+        ),
+      ],
     );
   }
 
