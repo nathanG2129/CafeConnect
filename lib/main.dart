@@ -7,6 +7,7 @@ import 'pages/order_menu.dart';
 import 'pages/order_history.dart';
 import 'pages/coffee_guide.dart';
 import 'pages/about_page.dart';
+import 'pages/staff/staff_dashboard.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/order-history': (context) => const OrderHistoryPage(),
         '/guide': (context) => const CoffeeGuidePage(),
         '/about': (context) => const AboutPage(),
+        '/staff-dashboard': (context) => const StaffDashboardPage(),
       },
     );
   }

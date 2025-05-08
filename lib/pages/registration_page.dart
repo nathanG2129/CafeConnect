@@ -485,6 +485,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         specialPreferences: _specialPreferencesController.text.isNotEmpty 
                             ? _specialPreferencesController.text 
                             : null,
+                        role: 'user',
                       );
                       
                       try {

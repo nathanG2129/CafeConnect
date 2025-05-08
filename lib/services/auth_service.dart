@@ -30,6 +30,7 @@ class AuthService {
         'favoriteCoffee': userModel.favoriteCoffee,
         'preferredVisitTime': userModel.preferredVisitTime,
         'specialPreferences': userModel.specialPreferences,
+        'role': userModel.role,
         'createdAt': FieldValue.serverTimestamp(),
       });
       
@@ -60,6 +61,16 @@ class AuthService {
       
       if (doc.exists) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        
+        // Check if role exists, if not update with default role
+        if (!data.containsKey('role')) {
+          await _firestore.collection('users').doc(uid).update({
+            'role': 'user',
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+          data['role'] = 'user';
+        }
+        
         // Create UserModel from Firestore data
         UserModel userModel = UserModel(
           id: uid,
@@ -69,6 +80,7 @@ class AuthService {
           favoriteCoffee: data['favoriteCoffee'],
           preferredVisitTime: data['preferredVisitTime'],
           specialPreferences: data['specialPreferences'],
+          role: data['role'],
         );
         return userModel;
       }
@@ -91,6 +103,7 @@ class AuthService {
           'favoriteCoffee': userModel.favoriteCoffee,
           'preferredVisitTime': userModel.preferredVisitTime,
           'specialPreferences': userModel.specialPreferences,
+          'role': userModel.role,
           'updatedAt': FieldValue.serverTimestamp(),
         });
         return true;
@@ -125,6 +138,16 @@ class AuthService {
         DocumentSnapshot doc = await _firestore.collection('users').doc(currentUser.uid).get();
         if (doc.exists) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          
+          // Check if role exists, if not update with default role
+          if (!data.containsKey('role')) {
+            await _firestore.collection('users').doc(currentUser.uid).update({
+              'role': 'user',
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
+            data['role'] = 'user';
+          }
+          
           return UserModel(
             id: currentUser.uid,
             name: data['name'],
@@ -133,6 +156,7 @@ class AuthService {
             favoriteCoffee: data['favoriteCoffee'],
             preferredVisitTime: data['preferredVisitTime'],
             specialPreferences: data['specialPreferences'],
+            role: data['role'],
           );
         }
       }
@@ -140,6 +164,47 @@ class AuthService {
     } catch (e) {
       // print(e.toString());
       return null;
+    }
+  }
+  
+  // Get landing page based on user role
+  String getLandingPage() {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        return '/login';
+      }
+      
+      // Get the user's role
+      return '/home'; // Default landing page
+    } catch (e) {
+      return '/login';
+    }
+  }
+  
+  // Get appropriate route based on user role
+  Future<String> getAppropriateRoute() async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        return '/login';
+      }
+      
+      UserModel? userModel = await getCurrentUserData();
+      if (userModel == null) {
+        return '/login';
+      }
+      
+      // Route based on role
+      switch (userModel.role) {
+        case 'staff':
+          return '/staff-dashboard';
+        case 'user':
+        default:
+          return '/home';
+      }
+    } catch (e) {
+      return '/login';
     }
   }
 }

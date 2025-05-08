@@ -6,6 +6,7 @@ class UserModel {
   String? favoriteCoffee;
   String? preferredVisitTime;
   String? specialPreferences;
+  String role;
 
   UserModel({
     this.id,
@@ -15,6 +16,7 @@ class UserModel {
     this.favoriteCoffee,
     this.preferredVisitTime,
     this.specialPreferences,
+    this.role = 'user',
   });
 
   // Update personal information
@@ -42,6 +44,11 @@ class UserModel {
     this.specialPreferences = specialPreferences;
   }
 
+  // Update user role
+  void updateRole(String role) {
+    this.role = role;
+  }
+
   // Convert UserModel to Map for Firestore
   Map<String, dynamic> toMap() {
     return {
@@ -52,6 +59,7 @@ class UserModel {
       'favoriteCoffee': favoriteCoffee,
       'preferredVisitTime': preferredVisitTime,
       'specialPreferences': specialPreferences,
+      'role': role,
     };
   }
 
@@ -65,6 +73,7 @@ class UserModel {
       favoriteCoffee: map['favoriteCoffee'],
       preferredVisitTime: map['preferredVisitTime'],
       specialPreferences: map['specialPreferences'],
+      role: map['role'] ?? 'user', // Default to 'user' if role is not present
     );
   }
 }

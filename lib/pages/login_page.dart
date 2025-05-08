@@ -311,14 +311,13 @@ class _LoginFormState extends State<LoginForm> {
         );
 
         if (result != null) {
-          // Login successful, navigate to home page
+          // Login successful, navigate based on user role
           if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomePage(),
-              ),
-            );
+            // Get the appropriate route based on user role
+            String route = await _authService.getAppropriateRoute();
+            
+            Navigator.pushReplacementNamed(context, route);
+            
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('Login Successful! Welcome back.'),

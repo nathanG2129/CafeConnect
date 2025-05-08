@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../models/userModel.dart';
 
 class AppDrawer extends StatefulWidget {
   final String? currentRoute;
@@ -13,18 +14,33 @@ class AppDrawer extends StatefulWidget {
 class _AppDrawerState extends State<AppDrawer> {
   final AuthService _authService = AuthService();
   bool _isLoggedIn = false;
+  bool _isStaff = false;
   int _selectedIndex = 0;
+  UserModel? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
+    _loadUserData();
   }
 
   void _checkLoginStatus() {
     setState(() {
       _isLoggedIn = _authService.isUserLoggedIn();
     });
+  }
+  
+  Future<void> _loadUserData() async {
+    if (_isLoggedIn) {
+      final user = await _authService.getCurrentUserData();
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+          _isStaff = user.role == 'staff';
+        });
+      }
+    }
   }
 
   @override
@@ -37,23 +53,38 @@ class _AppDrawerState extends State<AppDrawer> {
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
         children: [
-          const DrawerHeaderWidget(),
+          DrawerHeaderWidget(currentUser: _currentUser),
           const SizedBox(height: 12),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.home_outlined,
-                  customIcon: '☕',
-                  title: 'Home',
-                  index: 0,
-                  route: '/home',
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/home');
-                  },
-                ),
+                // HOME SECTION
+                if (_isStaff) 
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.dashboard_outlined,
+                    customIcon: '📊',
+                    title: 'Staff Dashboard',
+                    index: 0,
+                    route: '/staff-dashboard',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/staff-dashboard');
+                    },
+                  )
+                else
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.home_outlined,
+                    customIcon: '☕',
+                    title: 'Home',
+                    index: 0,
+                    route: '/home',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/home');
+                    },
+                  ),
+                
                 if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
@@ -66,44 +97,85 @@ class _AppDrawerState extends State<AppDrawer> {
                       Navigator.pushReplacementNamed(context, '/profile');
                     },
                   ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.restaurant_menu,
-                  customIcon: '🥐',
-                  title: 'Order Menu',
-                  index: 2,
-                  route: '/menu',
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/menu');
-                  },
-                ),
-                if (_isLoggedIn)
+                
+                // MAIN FEATURES
+                _buildCategorySeparator(_isStaff ? "MANAGEMENT" : "FEATURES"),
+                
+                if (_isStaff) ...[
                   _buildDrawerItem(
                     context,
                     icon: Icons.receipt_long,
                     customIcon: '📋',
-                    title: 'Order History',
+                    title: 'Orders Management',
+                    index: 2,
+                    route: '/menu',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/menu');
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.people_outline,
+                    customIcon: '👥',
+                    title: 'Customer Management',
                     index: 3,
                     route: '/order-history',
                     onTap: () {
                       Navigator.pushReplacementNamed(context, '/order-history');
                     },
                   ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.inventory_2_outlined,
+                    customIcon: '📦',
+                    title: 'Inventory',
+                    index: 4,
+                    route: '/guide',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/guide');
+                    },
+                  ),
+                ] else ...[
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.restaurant_menu,
+                    customIcon: '🥐',
+                    title: 'Order Menu',
+                    index: 2,
+                    route: '/menu',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/menu');
+                    },
+                  ),
+                  if (_isLoggedIn)
+                    _buildDrawerItem(
+                      context,
+                      icon: Icons.receipt_long,
+                      customIcon: '📋',
+                      title: 'Order History',
+                      index: 3,
+                      route: '/order-history',
+                      onTap: () {
+                        Navigator.pushReplacementNamed(context, '/order-history');
+                      },
+                    ),
+                  
+                  // EXPLORE SECTION
+                  _buildCategorySeparator("EXPLORE"),
+                  
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.menu_book_outlined,
+                    customIcon: '📘',
+                    title: 'Coffee Guide',
+                    index: 4,
+                    route: '/guide',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/guide');
+                    },
+                  ),
+                ],
                 
-                // Visual category separator
-                _buildCategorySeparator("EXPLORE"),
-                
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.menu_book_outlined,
-                  customIcon: '📘',
-                  title: 'Coffee Guide',
-                  index: 4,
-                  route: '/guide',
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/guide');
-                  },
-                ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.info_outline,
@@ -116,7 +188,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   },
                 ),
                 
-                // Visual category separator
+                // ACCOUNT SECTION
                 _buildCategorySeparator("ACCOUNT"),
                 
                 if (_isLoggedIn)
@@ -132,6 +204,8 @@ class _AppDrawerState extends State<AppDrawer> {
                       if (!mounted) return;
                       setState(() {
                         _isLoggedIn = false;
+                        _isStaff = false;
+                        _currentUser = null;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -167,6 +241,7 @@ class _AppDrawerState extends State<AppDrawer> {
   void _updateSelectedIndex(String currentRoute) {
     switch (currentRoute) {
       case '/home':
+      case '/staff-dashboard':
         _selectedIndex = 0;
         break;
       case '/profile':
@@ -289,12 +364,15 @@ class _AppDrawerState extends State<AppDrawer> {
 }
 
 class DrawerHeaderWidget extends StatelessWidget {
-  const DrawerHeaderWidget({super.key});
+  final UserModel? currentUser;
+  
+  const DrawerHeaderWidget({super.key, this.currentUser});
 
   @override
   Widget build(BuildContext context) {
     final AuthService authService = AuthService();
     final bool isLoggedIn = authService.isUserLoggedIn();
+    final bool isStaff = currentUser?.role == 'staff';
     
     return Container(
       width: double.infinity,
@@ -309,8 +387,8 @@ class DrawerHeaderWidget extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.brown.shade900,
-            Colors.brown.shade700,
+            isStaff ? Colors.brown.shade900 : Colors.brown.shade900,
+            isStaff ? Colors.brown.shade800 : Colors.brown.shade700,
           ],
         ),
       ),
@@ -331,12 +409,16 @@ class DrawerHeaderWidget extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(Icons.coffee, size: 32, color: Colors.brown[700]),
+            child: Icon(
+              isStaff ? Icons.badge : Icons.coffee,
+              size: 32,
+              color: Colors.brown[700],
+            ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Cafe Connect',
-            style: TextStyle(
+          Text(
+            isLoggedIn ? (currentUser?.name ?? 'Cafe Connect') : 'Cafe Connect',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -344,7 +426,7 @@ class DrawerHeaderWidget extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Your Coffee Destination',
+            isStaff ? 'Staff Portal' : 'Your Coffee Destination',
             style: TextStyle(
               color: Colors.brown[100],
               fontSize: 14,
@@ -358,7 +440,7 @@ class DrawerHeaderWidget extends StatelessWidget {
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: Colors.brown[600],
+                color: isStaff ? Colors.amber[700] : Colors.brown[600],
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -368,9 +450,9 @@ class DrawerHeaderWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Text(
-                'Logged In',
-                style: TextStyle(
+              child: Text(
+                isStaff ? 'Staff Account' : 'Customer',
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
