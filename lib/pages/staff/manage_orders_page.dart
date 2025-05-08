@@ -17,6 +17,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
   final OrderService _orderService = OrderService();
   late TabController _tabController;
   bool _isLoading = true;
+  bool _isRefreshing = false;
   List<OrderModel> _allOrders = [];
   
   // Filter orders by status
@@ -31,12 +32,8 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
     _tabController = TabController(length: 4, vsync: this);
     _loadOrders();
     
-    // Add listener to refresh orders when tab changes
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        _loadOrders();
-      }
-    });
+    // Set up a periodic refresh instead of refreshing on tab change
+    _setupPeriodicRefresh();
   }
   
   @override
@@ -45,7 +42,46 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
     super.dispose();
   }
   
+  void _setupPeriodicRefresh() {
+    // Refresh data every 30 seconds in the background
+    Future.delayed(const Duration(seconds: 30), () {
+      if (mounted) {
+        _refreshOrdersInBackground();
+        _setupPeriodicRefresh(); // Schedule the next refresh
+      }
+    });
+  }
+  
+  Future<void> _refreshOrdersInBackground() async {
+    if (!mounted) return;
+    
+    // Don't show loading indicator for background refreshes
+    setState(() {
+      _isRefreshing = true;
+    });
+    
+    try {
+      final orders = await _orderService.getAllOrders();
+      
+      if (mounted) {
+        setState(() {
+          _allOrders = orders;
+          _isRefreshing = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
+      // Silent error handling for background refreshes
+    }
+  }
+  
   Future<void> _loadOrders() async {
+    if (_isRefreshing) return; // Don't load if already refreshing in background
+    
     setState(() {
       _isLoading = true;
     });
@@ -107,10 +143,28 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadOrders,
-            tooltip: 'Refresh Orders',
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: _loadOrders,
+                tooltip: 'Refresh Orders',
+              ),
+              if (_isRefreshing)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
