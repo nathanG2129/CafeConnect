@@ -504,6 +504,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           // Clear the app drawer cache to reflect the new logged-in state
                           AppDrawerState.clearCache();
                           
+                          if (!mounted) return;
+                          
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => const HomePage()),
@@ -517,6 +519,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                             ),
                           );
                         } else {
+                          if (!mounted) return;
+                          
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: const Text('Registration Failed. Please try again.'),

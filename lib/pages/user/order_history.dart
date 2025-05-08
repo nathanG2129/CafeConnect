@@ -265,9 +265,6 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                     order.status.toLowerCase() == 'preparing';
     
     // Get a representative image for the order
-    String mainImagePath = order.items.isNotEmpty 
-        ? order.items.first.imagePath 
-        : 'assets/coffees/default.jpg';
     
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -523,7 +520,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Order added to cart'),
+        content: const Text('Order added to cart'),
         backgroundColor: Colors.green[600],
       ),
     );
@@ -540,7 +537,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Are you sure you want to cancel your order?'),
+                const Text('Are you sure you want to cancel your order?'),
                 const SizedBox(height: 8),
                 Text(
                   'This action cannot be undone.',
@@ -593,6 +590,8 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         // Refresh orders list
         await _loadOrders();
         
+        if (!mounted) return;
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Your order has been cancelled'),
@@ -603,6 +602,8 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         setState(() {
           _isLoading = false;
         });
+        
+        if (!mounted) return;
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

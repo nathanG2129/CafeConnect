@@ -270,8 +270,6 @@ class AppDrawerState extends State<AppDrawer> {
     bool isStaff, 
     UserModel? currentUser
   ) {
-    int selectedIndex = _getSelectedIndex(currentRoute);
-    
     return Drawer(
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
@@ -413,14 +411,14 @@ class AppDrawerState extends State<AppDrawer> {
                     route: '',
                     onTap: () async {
                       await _authService.signOut();
-                      if (!mounted) return;
+                      
                       
                       // Clear cache and reload data
                       clearCache();
                       setState(() {
                         _drawerDataFuture = preloadData();
                       });
-                      
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('You have been signed out'),

@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class OrderItemModel {
   final String id;
   final String coffeeName;

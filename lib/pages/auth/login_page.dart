@@ -312,30 +312,34 @@ class _LoginFormState extends State<LoginForm> {
 
         if (result != null) {
           // Login successful, navigate based on user role
-          if (mounted) {
-            // Clear the drawer cache to ensure it updates with the new login state
-            AppDrawerState.clearCache();
+          if (!mounted) return;
+          
+          // Clear the drawer cache to ensure it updates with the new login state
+          AppDrawerState.clearCache();
             
-            // Get the appropriate route based on user role
-            String route = await _authService.getAppropriateRoute();
+          // Get the appropriate route based on user role
+          String route = await _authService.getAppropriateRoute();
             
-            Navigator.pushReplacementNamed(context, route);
+          if (!mounted) return;
+          
+          Navigator.pushReplacementNamed(context, route);
             
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Login Successful! Welcome back.'),
-                backgroundColor: Colors.green[600],
-              ),
-            );
-          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Login Successful! Welcome back.'),
+              backgroundColor: Colors.green[600],
+            ),
+          );
         } else {
           // Login failed
+          if (!mounted) return;
           setState(() {
             _isLoading = false;
             _errorMessage = 'Invalid email or password. Please try again.';
           });
         }
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
           _errorMessage = 'Error: ${e.toString()}';

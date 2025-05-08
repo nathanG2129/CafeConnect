@@ -542,6 +542,8 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
         // Refresh orders
         await _loadOrders();
         
+        if (!mounted) return;
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Order status updated to $newStatus'),
@@ -549,6 +551,8 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
           ),
         );
       } else {
+        if (!mounted) return;
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to update order status'),

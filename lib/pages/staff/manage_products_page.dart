@@ -31,11 +31,13 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
 
     try {
       final products = await _productService.getAllProducts();
+      if (!mounted) return;
       setState(() {
         _products = products;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -209,10 +211,10 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                                   product.id,
                                   newValue,
                                 );
+                                if (!mounted) return;
                                 if (success) {
                                   _loadProducts();
                                 } else {
-                                  if (!mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text('Failed to update availability'),
@@ -274,6 +276,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                 builder: (context) => EditProductPage(product: product),
               ),
             );
+            if (!mounted) return;
             if (result == true) {
               _loadProducts();
             }
@@ -286,10 +289,10 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
               product.id,
               !product.isAvailable,
             );
+            if (!mounted) return;
             if (success) {
               _loadProducts();
             } else {
-              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Failed to update availability'),
@@ -356,10 +359,10 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
             onPressed: () async {
               Navigator.pop(context);
               final success = await _productService.deleteProduct(product.id);
+              if (!mounted) return;
               if (success) {
                 _loadProducts();
               } else {
-                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Failed to delete product'),
