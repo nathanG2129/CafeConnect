@@ -11,6 +11,7 @@ class AppDrawer extends StatefulWidget {
 class _AppDrawerState extends State<AppDrawer> {
   final AuthService _authService = AuthService();
   bool _isLoggedIn = false;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -26,59 +27,104 @@ class _AppDrawerState extends State<AppDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine which page is currently active based on route
+    final String currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
+    _updateSelectedIndex(currentRoute);
+
     return Drawer(
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
         children: [
           const DrawerHeaderWidget(),
+          const SizedBox(height: 12),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
                 _buildDrawerItem(
                   context,
-                  icon: Icons.home,
+                  icon: Icons.home_outlined,
+                  customIcon: '☕',
                   title: 'Home',
-                  onTap: () => Navigator.pushReplacementNamed(context, '/home'),
+                  index: 0,
+                  route: '/home',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/home');
+                  },
                 ),
                 if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
-                    icon: Icons.person,
+                    icon: Icons.person_outline,
+                    customIcon: '👤',
                     title: 'Profile',
-                    onTap: () => Navigator.pushReplacementNamed(context, '/profile'),
+                    index: 1,
+                    route: '/profile',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/profile');
+                    },
                   ),
                 _buildDrawerItem(
                   context,
-                  icon: Icons.coffee,
+                  icon: Icons.restaurant_menu,
+                  customIcon: '🥐',
                   title: 'Order Menu',
-                  onTap: () => Navigator.pushReplacementNamed(context, '/menu'),
+                  index: 2,
+                  route: '/menu',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/menu');
+                  },
                 ),
                 if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
                     icon: Icons.receipt_long,
+                    customIcon: '📋',
                     title: 'Order History',
-                    onTap: () => Navigator.pushReplacementNamed(context, '/order-history'),
+                    index: 3,
+                    route: '/order-history',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/order-history');
+                    },
                   ),
+                
+                // Visual category separator
+                _buildCategorySeparator("EXPLORE"),
+                
                 _buildDrawerItem(
                   context,
-                  icon: Icons.menu_book,
+                  icon: Icons.menu_book_outlined,
+                  customIcon: '📘',
                   title: 'Coffee Guide',
-                  onTap: () => Navigator.pushReplacementNamed(context, '/guide'),
+                  index: 4,
+                  route: '/guide',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/guide');
+                  },
                 ),
                 _buildDrawerItem(
                   context,
-                  icon: Icons.info,
+                  icon: Icons.info_outline,
+                  customIcon: '📍',
                   title: 'About Us',
-                  onTap: () => Navigator.pushReplacementNamed(context, '/about'),
+                  index: 5,
+                  route: '/about',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/about');
+                  },
                 ),
-                const Divider(height: 1),
+                
+                // Visual category separator
+                _buildCategorySeparator("ACCOUNT"),
+                
                 if (_isLoggedIn)
                   _buildDrawerItem(
                     context,
-                    icon: Icons.logout,
+                    icon: Icons.logout_outlined,
+                    customIcon: '🚪',
                     title: 'Sign Out',
+                    index: 6,
+                    route: '',
                     onTap: () async {
                       await _authService.signOut();
                       setState(() {
@@ -96,9 +142,14 @@ class _AppDrawerState extends State<AppDrawer> {
                 else
                   _buildDrawerItem(
                     context,
-                    icon: Icons.login,
+                    icon: Icons.login_outlined,
+                    customIcon: '🔑',
                     title: 'Sign In',
-                    onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                    index: 6,
+                    route: '/login',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
                   ),
               ],
             ),
@@ -109,21 +160,124 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
+  // Method to update the selected index based on the current route
+  void _updateSelectedIndex(String currentRoute) {
+    switch (currentRoute) {
+      case '/home':
+        _selectedIndex = 0;
+        break;
+      case '/profile':
+        _selectedIndex = 1;
+        break;
+      case '/menu':
+        _selectedIndex = 2;
+        break;
+      case '/order-history':
+        _selectedIndex = 3;
+        break;
+      case '/guide':
+        _selectedIndex = 4;
+        break;
+      case '/about':
+        _selectedIndex = 5;
+        break;
+      case '/login':
+        _selectedIndex = 6;
+        break;
+      default:
+        _selectedIndex = 0;
+    }
+  }
+
+  Widget _buildCategorySeparator(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.brown[600],
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.brown.withOpacity(0.3),
+                    Colors.brown.withOpacity(0.1),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDrawerItem(
     BuildContext context, {
     required IconData icon,
+    required String customIcon,
     required String title,
+    required int index,
+    required String route,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.brown),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.brown,
+    // Check if this is the current route
+    final String currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
+    final bool isSelected = currentRoute == route;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.brown.withOpacity(0.2) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.brown.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.brown.withOpacity(0.1),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Text(
+            customIcon,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.brown[800],
+            ),
+          ),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.brown[800],
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
-      onTap: onTap,
     );
   }
 }
@@ -145,17 +299,31 @@ class DrawerHeaderWidget extends StatelessWidget {
         right: 24,
       ),
       decoration: BoxDecoration(
-        color: Colors.brown[700],
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.brown.shade900,
+            Colors.brown.shade700,
+          ],
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Icon(Icons.coffee, size: 32, color: Colors.brown[700]),
           ),
@@ -186,6 +354,13 @@ class DrawerHeaderWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.brown[600],
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: const Text(
                 'Logged In',
@@ -209,46 +384,14 @@ class DrawerFooterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildSocialButton(Icons.facebook, () {}),
-              const SizedBox(width: 24),
-              _buildSocialButton(Icons.camera_alt, () {}),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '© 2025 CafeConnect',
-            style: TextStyle(
-              color: Colors.brown[400],
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialButton(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.brown[50],
-          borderRadius: BorderRadius.circular(30),
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Text(
+        '© 2025 CafeConnect',
+        style: TextStyle(
+          color: Colors.brown[400],
+          fontSize: 12,
         ),
-        child: Icon(
-          icon,
-          color: Colors.brown[700],
-          size: 24,
-        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
