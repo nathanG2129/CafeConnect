@@ -45,23 +45,6 @@ class CartModel {
     _saveToStorage();
   }
   
-  // Add item from legacy OrderModel (for backward compatibility)
-  void addItemFromLegacyOrder(OrderModel legacyOrder) {
-    // Convert old OrderModel to new OrderItemModel
-    OrderItemModel item = OrderItemModel(
-      id: legacyOrder.id,
-      coffeeName: legacyOrder.coffeeName ?? '',
-      size: legacyOrder.size ?? '',
-      addOn: legacyOrder.addOn,
-      quantity: legacyOrder.quantity ?? 1,
-      basePrice: legacyOrder.basePrice ?? 0.0,
-      totalPrice: legacyOrder.totalPrice ?? 0.0,
-      imagePath: legacyOrder.imagePath ?? '',
-    );
-    
-    addItem(item);
-  }
-  
   // Remove item from cart
   void removeItem(String itemId) {
     items.removeWhere((item) => item.id == itemId);

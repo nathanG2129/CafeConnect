@@ -72,20 +72,6 @@ class OrderItemModel {
     );
   }
 
-  // Create OrderItemModel from legacy OrderModel
-  factory OrderItemModel.fromLegacyOrder(Map<String, dynamic> map) {
-    return OrderItemModel(
-      id: map['id'] ?? '',
-      coffeeName: map['coffeeName'] ?? '',
-      size: map['size'] ?? '',
-      addOn: map['addOn'],
-      quantity: map['quantity'] ?? 1,
-      basePrice: map['basePrice'] ?? 0.0,
-      totalPrice: map['totalPrice'] ?? 0.0,
-      imagePath: map['imagePath'] ?? '',
-    );
-  }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
