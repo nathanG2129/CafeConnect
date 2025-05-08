@@ -78,8 +78,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             _buildQuickAccessPanel(),
             const SizedBox(height: 24),
             _buildStatisticsSection(),
-            const SizedBox(height: 24),
-            _buildRecentOrdersSection(),
           ],
         ),
       ),
@@ -198,40 +196,12 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
               mainAxisSpacing: 16,
               children: [
                 _buildQuickAccessItem(
-                  icon: Icons.receipt_long,
-                  title: "Orders",
-                  color: Colors.blue,
-                  onTap: () {},
-                ),
-                _buildQuickAccessItem(
-                  icon: Icons.inventory,
-                  title: "Inventory",
-                  color: Colors.green,
-                  onTap: () {},
-                ),
-                _buildQuickAccessItem(
-                  icon: Icons.people,
-                  title: "Customers",
-                  color: Colors.purple,
-                  onTap: () {},
-                ),
-                _buildQuickAccessItem(
-                  icon: Icons.local_shipping,
-                  title: "Deliveries",
-                  color: Colors.orange,
-                  onTap: () {},
-                ),
-                _buildQuickAccessItem(
-                  icon: Icons.event_note,
-                  title: "Schedule",
-                  color: Colors.teal,
-                  onTap: () {},
-                ),
-                _buildQuickAccessItem(
-                  icon: Icons.settings,
-                  title: "Settings",
-                  color: Colors.grey[700]!,
-                  onTap: () {},
+                  icon: Icons.coffee,
+                  title: "Products",
+                  color: Colors.amber[700]!,
+                  onTap: () {
+                    Navigator.pushNamed(context, '/manage-products');
+                  },
                 ),
               ],
             ),
@@ -292,7 +262,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Today's Statistics",
+              "System Status",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -304,41 +274,10 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    title: "Orders",
-                    value: "28",
-                    icon: Icons.shopping_bag,
-                    color: Colors.blue,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildStatCard(
-                    title: "Revenue",
-                    value: "₱8,720",
-                    icon: Icons.attach_money,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    title: "Customers",
-                    value: "42",
-                    icon: Icons.person,
-                    color: Colors.purple,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildStatCard(
-                    title: "Avg. Order",
-                    value: "₱312",
-                    icon: Icons.assessment,
-                    color: Colors.orange,
+                    title: "Products",
+                    value: "Available",
+                    icon: Icons.coffee,
+                    color: Colors.amber[700]!,
                   ),
                 ),
               ],
@@ -393,150 +332,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildRecentOrdersSection() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Recent Orders",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown[800],
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.visibility),
-                  label: const Text("View All"),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.brown[700],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 5,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (context, index) {
-                return _buildOrderItem(
-                  orderNumber: "ORD-${1000 + index}",
-                  customerName: "Customer ${index + 1}",
-                  time: "${9 + index}:${index * 10}${index * 5} AM",
-                  items: "${3 + index} items",
-                  amount: "₱${300 + index * 50}.00",
-                  status: index % 3 == 0 ? "Pending" : (index % 3 == 1 ? "Preparing" : "Ready"),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOrderItem({
-    required String orderNumber,
-    required String customerName,
-    required String time,
-    required String items,
-    required String amount,
-    required String status,
-  }) {
-    Color statusColor;
-    
-    switch (status) {
-      case "Pending":
-        statusColor = Colors.orange;
-        break;
-      case "Preparing":
-        statusColor = Colors.blue;
-        break;
-      case "Ready":
-        statusColor = Colors.green;
-        break;
-      default:
-        statusColor = Colors.grey;
-    }
-    
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Row(
-        children: [
-          Text(
-            orderNumber,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: statusColor.withOpacity(0.3)),
-            ),
-            child: Text(
-              status,
-              style: TextStyle(
-                fontSize: 12,
-                color: statusColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 4),
-          Text(customerName),
-          Text("$time • $items"),
-        ],
-      ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            amount,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 4),
-          GestureDetector(
-            onTap: () {},
-            child: Text(
-              "Details",
-              style: TextStyle(
-                color: Colors.brown[700],
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ],
-      ),
-      onTap: () {},
     );
   }
 } 

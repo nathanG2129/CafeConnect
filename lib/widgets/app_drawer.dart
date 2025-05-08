@@ -104,35 +104,13 @@ class _AppDrawerState extends State<AppDrawer> {
                 if (_isStaff) ...[
                   _buildDrawerItem(
                     context,
-                    icon: Icons.receipt_long,
-                    customIcon: '📋',
-                    title: 'Orders Management',
+                    icon: Icons.coffee,
+                    customIcon: '☕',
+                    title: 'Manage Products',
                     index: 2,
-                    route: '/menu',
+                    route: '/manage-products',
                     onTap: () {
-                      Navigator.pushReplacementNamed(context, '/menu');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.people_outline,
-                    customIcon: '👥',
-                    title: 'Customer Management',
-                    index: 3,
-                    route: '/order-history',
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, '/order-history');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.inventory_2_outlined,
-                    customIcon: '📦',
-                    title: 'Inventory',
-                    index: 4,
-                    route: '/guide',
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, '/guide');
+                      Navigator.pushReplacementNamed(context, '/manage-products');
                     },
                   ),
                 ] else ...[

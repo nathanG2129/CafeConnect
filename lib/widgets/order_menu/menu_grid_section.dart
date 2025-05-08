@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderModel.dart';
+import 'package:flutter_activity1/models/product_model.dart';
+import 'package:flutter_activity1/services/product_service.dart';
 import 'package:flutter_activity1/widgets/order_menu/order_dialog.dart';
 
-class MenuGridSection extends StatelessWidget {
+class MenuGridSection extends StatefulWidget {
   final Function(OrderModel) onAddToCart;
 
   const MenuGridSection({
@@ -10,76 +12,189 @@ class MenuGridSection extends StatelessWidget {
     required this.onAddToCart,
   });
 
-  final List<Map<String, dynamic>> coffees = const [
-    {
-      'name': 'Espresso',
-      'image': 'assets/coffees/expresso.jpg',
-      'price': 2.99,
-      'description': 'Strong and concentrated coffee shot',
-    },
-    {
-      'name': 'Cappuccino',
-      'image': 'assets/coffees/capuccino.jpg',
-      'price': 4.49,
-      'description': 'Equal parts espresso, steamed milk, and milk foam',
-    },
-    {
-      'name': 'Latte',
-      'image': 'assets/coffees/latte.jpg',
-      'price': 4.29,
-      'description': 'Espresso with steamed milk and light foam',
-    },
-    {
-      'name': 'Americano',
-      'image': 'assets/coffees/americano.jpg',
-      'price': 3.49,
-      'description': 'Espresso diluted with hot water',
-    },
-    {
-      'name': 'Mocha',
-      'image': 'assets/coffees/mocha.jpg',
-      'price': 4.49,
-      'description': 'Espresso with chocolate and steamed milk',
-    },
-    {
-      'name': 'Cold Brew',
-      'image': 'assets/coffees/coldbrew.jpg',
-      'price': 3.99,
-      'description': 'Smooth, cold-steeped coffee',
-    },
-    {
-      'name': 'Caramel Macchiato',
-      'image': 'assets/coffees/macchiato.jpg',
-      'price': 4.99,
-      'description': 'Vanilla-flavored drink marked with espresso and caramel',
-    },
-  ];
+  @override
+  State<MenuGridSection> createState() => _MenuGridSectionState();
+}
+
+class _MenuGridSectionState extends State<MenuGridSection> {
+  final ProductService _productService = ProductService();
+  List<ProductModel> _products = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final products = await _productService.getAvailableProducts();
+      setState(() {
+        _products = products;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _products = _getFallbackProducts(); // Use fallback if Firebase fails
+      });
+    }
+  }
+
+  // Fallback products if Firebase is unavailable
+  List<ProductModel> _getFallbackProducts() {
+    final DateTime now = DateTime.now();
+    return [
+      ProductModel(
+        id: '1',
+        name: 'Espresso',
+        description: 'Strong and concentrated coffee shot',
+        imagePath: 'assets/coffees/expresso.jpg',
+        basePrice: 2.99,
+        isAvailable: true,
+        sizes: [
+          {'name': 'Small', 'price': 0.0},
+          {'name': 'Medium', 'price': 0.5},
+          {'name': 'Large', 'price': 1.0},
+        ],
+        addOns: [
+          {'name': 'Extra Shot (+\$0.50)', 'price': 0.5},
+          {'name': 'Whipped Cream (+\$0.50)', 'price': 0.5},
+          {'name': 'Caramel Drizzle (+\$0.30)', 'price': 0.3},
+          {'name': 'Chocolate Sauce (+\$0.30)', 'price': 0.3},
+        ],
+        createdAt: now,
+        updatedAt: now,
+      ),
+      ProductModel(
+        id: '2',
+        name: 'Cappuccino',
+        description: 'Equal parts espresso, steamed milk, and milk foam',
+        imagePath: 'assets/coffees/capuccino.jpg',
+        basePrice: 4.49,
+        isAvailable: true,
+        sizes: [
+          {'name': 'Small', 'price': 0.0},
+          {'name': 'Medium', 'price': 0.5},
+          {'name': 'Large', 'price': 1.0},
+        ],
+        addOns: [
+          {'name': 'Extra Shot (+\$0.50)', 'price': 0.5},
+          {'name': 'Whipped Cream (+\$0.50)', 'price': 0.5},
+          {'name': 'Caramel Drizzle (+\$0.30)', 'price': 0.3},
+          {'name': 'Chocolate Sauce (+\$0.30)', 'price': 0.3},
+        ],
+        createdAt: now,
+        updatedAt: now,
+      ),
+      ProductModel(
+        id: '3',
+        name: 'Latte',
+        description: 'Espresso with steamed milk and light foam',
+        imagePath: 'assets/coffees/latte.jpg',
+        basePrice: 4.29,
+        isAvailable: true,
+        sizes: [
+          {'name': 'Small', 'price': 0.0},
+          {'name': 'Medium', 'price': 0.5},
+          {'name': 'Large', 'price': 1.0},
+        ],
+        addOns: [
+          {'name': 'Extra Shot (+\$0.50)', 'price': 0.5},
+          {'name': 'Whipped Cream (+\$0.50)', 'price': 0.5},
+          {'name': 'Caramel Drizzle (+\$0.30)', 'price': 0.3},
+          {'name': 'Chocolate Sauce (+\$0.30)', 'price': 0.3},
+        ],
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: coffees.length,
-        itemBuilder: (context, index) {
-          final coffee = coffees[index];
-          return _buildCoffeeCard(context, coffee);
-        },
+      child: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Colors.brown))
+          : _products.isEmpty
+              ? _buildEmptyState()
+              : _buildProductsGrid(),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.coffee,
+            size: 80,
+            color: Colors.brown[300],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No products available',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.brown[700],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please check back later',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.brown[600],
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: _loadProducts,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Refresh'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.brown[700],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildCoffeeCard(BuildContext context, Map<String, dynamic> coffee) {
+  Widget _buildProductsGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: _products.length,
+      itemBuilder: (context, index) {
+        final product = _products[index];
+        return _buildProductCard(context, product);
+      },
+    );
+  }
+
+  Widget _buildProductCard(BuildContext context, ProductModel product) {
     return GestureDetector(
-      onTap: () => _showOrderDialog(context, coffee),
+      onTap: () => _showOrderDialog(context, product),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -100,7 +215,7 @@ class MenuGridSection extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 child: Image.asset(
-                  coffee['image'],
+                  product.imagePath,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -112,7 +227,7 @@ class MenuGridSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    coffee['name'],
+                    product.name,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -121,7 +236,7 @@ class MenuGridSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '\$${coffee['price'].toStringAsFixed(2)}',
+                    '\$${product.basePrice.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -137,12 +252,12 @@ class MenuGridSection extends StatelessWidget {
     );
   }
 
-  void _showOrderDialog(BuildContext context, Map<String, dynamic> coffee) {
+  void _showOrderDialog(BuildContext context, ProductModel product) {
     showDialog(
       context: context,
       builder: (context) => OrderDialog(
-        coffee: coffee,
-        onAddToCart: onAddToCart,
+        product: product,
+        onAddToCart: widget.onAddToCart,
       ),
     );
   }

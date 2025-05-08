@@ -8,6 +8,7 @@ import 'pages/user/order_history.dart';
 import 'pages/user/coffee_guide.dart';
 import 'pages/user/about_page.dart';
 import 'pages/staff/staff_dashboard.dart';
+import 'pages/staff/manage_products_page.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/guide': (context) => const CoffeeGuidePage(),
         '/about': (context) => const AboutPage(),
         '/staff-dashboard': (context) => const StaffDashboardPage(),
+        '/manage-products': (context) => const ManageProductsPage(),
       },
     );
   }

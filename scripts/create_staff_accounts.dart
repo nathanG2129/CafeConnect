@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import '../lib/firebase_options.dart';
-import '../lib/models/userModel.dart';
-import '../lib/services/auth_service.dart';
+import 'package:flutter_activity1/firebase_options.dart';
+import 'package:flutter_activity1/models/userModel.dart';
+import 'package:flutter_activity1/services/auth_service.dart';
 import 'dart:io';
 
 /*
@@ -49,7 +49,6 @@ void main() async {
   // Create each staff account
   for (var staffData in staffAccounts) {
     try {
-      print('Creating staff account: ${staffData['email']}');
       
       // Create user model
       final UserModel staffUser = UserModel(
@@ -67,20 +66,13 @@ void main() async {
       );
       
       if (result != null) {
-        print('✅ Successfully created staff account: ${staffData['email']}');
       } else {
-        print('❌ Failed to create staff account: ${staffData['email']}');
       }
     } catch (e) {
-      print('❌ Error creating staff account: ${staffData['email']}');
-      print('   Error message: $e');
+
     }
   }
   
-  print('\nStaff account creation completed!');
-  print('You can now login with these credentials:');
-  print('1. Email: staff1@example.com, Password: staff123');
-  print('2. Email: staff2@example.com, Password: staff123');
   
   // Exit the script
   exit(0);

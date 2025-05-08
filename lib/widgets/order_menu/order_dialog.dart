@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderModel.dart';
+import 'package:flutter_activity1/models/product_model.dart';
 import 'dart:math';
 
 class OrderDialog extends StatefulWidget {
-  final Map<String, dynamic> coffee;
+  final ProductModel product;
   final Function(OrderModel) onAddToCart;
 
   const OrderDialog({
     super.key,
-    required this.coffee,
+    required this.product,
     required this.onAddToCart,
   });
 
@@ -21,36 +22,30 @@ class _OrderDialogState extends State<OrderDialog> {
   String? selectedAddOn;
   int quantity = 1;
   bool showSizeError = false;
-  final List<String> sizes = ['Small', 'Medium', 'Large'];
-  final List<String> addOns = [
-    'Extra Shot (+\$0.50)',
-    'Whipped Cream (+\$0.50)',
-    'Caramel Drizzle (+\$0.30)',
-    'Chocolate Sauce (+\$0.30)',
-  ];
 
-  // Price modifiers
-  final Map<String, double> sizePrices = {
-    'Small': 0.0,
-    'Medium': 0.50,
-    'Large': 1.00,
-  };
+  // Get price modifiers
+  double getSizePrice(String? size) {
+    if (size == null) return 0.0;
+    final sizeOption = widget.product.sizes.firstWhere(
+      (s) => s['name'] == size,
+      orElse: () => {'name': '', 'price': 0.0},
+    );
+    return sizeOption['price'];
+  }
 
-  final Map<String, double> addOnPrices = {
-    'Extra Shot (+\$0.50)': 0.50,
-    'Whipped Cream (+\$0.50)': 0.50,
-    'Caramel Drizzle (+\$0.30)': 0.30,
-    'Chocolate Sauce (+\$0.30)': 0.30,
-  };
+  double getAddOnPrice(String? addOn) {
+    if (addOn == null) return 0.0;
+    final addOnOption = widget.product.addOns.firstWhere(
+      (a) => a['name'] == addOn,
+      orElse: () => {'name': '', 'price': 0.0},
+    );
+    return addOnOption['price'];
+  }
 
   double get totalPrice {
-    double basePrice = widget.coffee['price'];
-    if (selectedSize != null) {
-      basePrice += sizePrices[selectedSize]!;
-    }
-    if (selectedAddOn != null) {
-      basePrice += addOnPrices[selectedAddOn]!;
-    }
+    double basePrice = widget.product.basePrice;
+    basePrice += getSizePrice(selectedSize);
+    basePrice += getAddOnPrice(selectedAddOn);
     return basePrice * quantity;
   }
 
@@ -68,13 +63,13 @@ class _OrderDialogState extends State<OrderDialog> {
     // Create an OrderModel
     final OrderModel order = OrderModel(
       id: orderId,
-      coffeeName: widget.coffee['name'],
+      coffeeName: widget.product.name,
       size: selectedSize!,
       addOn: selectedAddOn,
       quantity: quantity,
-      basePrice: widget.coffee['price'],
+      basePrice: widget.product.basePrice,
       totalPrice: totalPrice,
-      imagePath: widget.coffee['image'],
+      imagePath: widget.product.imagePath,
       orderDate: DateTime.now(),
     );
 
@@ -85,7 +80,7 @@ class _OrderDialogState extends State<OrderDialog> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Added ${quantity}x ${widget.coffee['name']} ($selectedSize)${selectedAddOn != null ? ' with $selectedAddOn' : ''} to cart',
+          'Added ${quantity}x ${widget.product.name} ($selectedSize)${selectedAddOn != null ? ' with $selectedAddOn' : ''} to cart',
         ),
         backgroundColor: Colors.green[600],
         duration: const Duration(seconds: 2),
@@ -118,7 +113,7 @@ class _OrderDialogState extends State<OrderDialog> {
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: Image.asset(
-                    widget.coffee['image'],
+                    widget.product.imagePath,
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -168,7 +163,7 @@ class _OrderDialogState extends State<OrderDialog> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.coffee['name'],
+                          widget.product.name,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -177,7 +172,7 @@ class _OrderDialogState extends State<OrderDialog> {
                         ),
                       ),
                       Text(
-                        'Base: \$${widget.coffee['price'].toStringAsFixed(2)}',
+                        'Base: \$${widget.product.basePrice.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.brown[700],
@@ -187,7 +182,7 @@ class _OrderDialogState extends State<OrderDialog> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.coffee['description'],
+                    widget.product.description,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.brown[600],
@@ -253,12 +248,14 @@ class _OrderDialogState extends State<OrderDialog> {
                       labelText: 'Size *',
                       border: const OutlineInputBorder(),
                       errorText: showSizeError ? 'Please select a size' : null,
-                      helperText: 'Price adjustments: Medium +\$0.50, Large +\$1.00',
+                      helperText: 'Select a size for your beverage',
                     ),
-                    items: sizes.map((String size) {
+                    items: widget.product.sizes.map((Map<String, dynamic> size) {
+                      final name = size['name'];
+                      final price = size['price'] as double;
                       return DropdownMenuItem<String>(
-                        value: size,
-                        child: Text('$size ${sizePrices[size]! > 0 ? "(+\$${sizePrices[size]!.toStringAsFixed(2)})" : ""}'),
+                        value: name,
+                        child: Text('$name ${price > 0 ? "(+\$${price.toStringAsFixed(2)})" : ""}'),
                       );
                     }).toList(),
                     onChanged: (String? value) {
@@ -278,10 +275,12 @@ class _OrderDialogState extends State<OrderDialog> {
                       border: OutlineInputBorder(),
                       helperText: 'Customize your drink with extra toppings',
                     ),
-                    items: addOns.map((String addOn) {
+                    items: widget.product.addOns.map((Map<String, dynamic> addOn) {
+                      final name = addOn['name'];
+                      final price = addOn['price'] as double;
                       return DropdownMenuItem<String>(
-                        value: addOn,
-                        child: Text(addOn),
+                        value: name,
+                        child: Text('$name (+\$${price.toStringAsFixed(2)})'),
                       );
                     }).toList(),
                     onChanged: (String? value) {
