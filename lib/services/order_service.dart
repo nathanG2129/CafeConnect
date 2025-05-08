@@ -24,7 +24,7 @@ class OrderService {
 
       return true;
     } catch (e) {
-      print('Error saving order: ${e.toString()}');
+      // print('Error saving order: ${e.toString()}');
       return false;
     }
   }
@@ -51,7 +51,7 @@ class OrderService {
         return OrderModel.fromMap(data);
       }).toList();
     } catch (e) {
-      print('Error getting orders: ${e.toString()}');
+      // print('Error getting orders: ${e.toString()}');
       return [];
     }
   }
@@ -74,7 +74,7 @@ class OrderService {
 
       return true;
     } catch (e) {
-      print('Error deleting order: ${e.toString()}');
+      // print('Error deleting order: ${e.toString()}');
       return false;
     }
   }

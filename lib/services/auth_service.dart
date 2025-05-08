@@ -35,7 +35,7 @@ class AuthService {
       
       return userModel;
     } catch (e) {
-      print(e.toString());
+      // print(e.toString());
       return null;
     }
   }
@@ -74,7 +74,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print(e.toString());
+      // print(e.toString());
       return null;
     }
   }
@@ -97,7 +97,7 @@ class AuthService {
       }
       return false;
     } catch (e) {
-      print(e.toString());
+      // print(e.toString());
       return false;
     }
   }
@@ -138,7 +138,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print(e.toString());
+      // print(e.toString());
       return null;
     }
   }
