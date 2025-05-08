@@ -129,6 +129,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     route: '',
                     onTap: () async {
                       await _authService.signOut();
+                      if (!mounted) return;
                       setState(() {
                         _isLoggedIn = false;
                       });

@@ -443,6 +443,7 @@ class _CartViewState extends State<CartView> {
     // Check if user is logged in
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please log in to place an order'),
@@ -474,6 +475,7 @@ class _CartViewState extends State<CartView> {
         }
       }
 
+      if (!mounted) return;
       setState(() {
         _isProcessing = false;
       });
@@ -497,6 +499,7 @@ class _CartViewState extends State<CartView> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isProcessing = false;
       });

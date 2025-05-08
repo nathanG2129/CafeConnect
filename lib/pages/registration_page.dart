@@ -494,6 +494,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           userModel: newUser,
                         );
                         
+                        if (!mounted) return;
                         setState(() {
                           _isLoading = false;
                         });
@@ -520,6 +521,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           );
                         }
                       } catch (e) {
+                        if (!mounted) return;
                         setState(() {
                           _isLoading = false;
                         });

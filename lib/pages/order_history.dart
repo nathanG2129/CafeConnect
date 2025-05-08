@@ -32,11 +32,13 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
 
     try {
       final orders = await _orderService.getUserOrders();
+      if (!mounted) return;
       setState(() {
         _orders = orders;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _hasError = true;

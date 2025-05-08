@@ -96,6 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
     
     // Use a Future.delayed to ensure the build method has completed
     Future.delayed(Duration.zero, () {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please login to view your profile'),
@@ -118,6 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _isLoading = false;
     });
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Error loading profile: $error'),
@@ -152,6 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // Save to Firestore
         final success = await _authService.updateUserData(_userModel!);
         
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
           _isEditing = false;
@@ -173,6 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         }
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });
