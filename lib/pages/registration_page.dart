@@ -7,11 +7,15 @@ import '../services/auth_service.dart';
 import 'home_page.dart';
 
 class RegistrationPage extends StatelessWidget {
+  static const String routeName = '/register';
+  
   const RegistrationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Add a key to force the AppDrawer to rebuild and update its selection
     return Scaffold(
+      key: UniqueKey(),
       backgroundColor: const Color(0xFFF5E6D3),
       appBar: AppBar(
         title: const Text("Registration"),
@@ -19,7 +23,7 @@ class RegistrationPage extends StatelessWidget {
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
       ),
-      drawer: const AppDrawer(),
+      drawer: const AppDrawer(currentRoute: '/register'),
       body: const SingleChildScrollView(
         child: Column(
           children: [
@@ -462,25 +466,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                OutlinedButton(
-                  onPressed: _isLoading ? null : () {
-                    Navigator.pop(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(120, 45),
-                    side: BorderSide(color: Colors.brown[700]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Back',
-                    style: TextStyle(
-                      color: Colors.brown[700],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
                 ElevatedButton(
                   onPressed: _isLoading ? null : () async {
                     setState(() {

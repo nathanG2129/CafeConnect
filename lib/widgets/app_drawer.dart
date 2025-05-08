@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
 class AppDrawer extends StatefulWidget {
-  const AppDrawer({super.key});
+  final String? currentRoute;
+  
+  const AppDrawer({super.key, this.currentRoute});
 
   @override
   State<AppDrawer> createState() => _AppDrawerState();
@@ -28,7 +30,7 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     // Determine which page is currently active based on route
-    final String currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
+    final String currentRoute = widget.currentRoute ?? ModalRoute.of(context)?.settings.name ?? '/home';
     _updateSelectedIndex(currentRoute);
 
     return Drawer(
@@ -182,6 +184,7 @@ class _AppDrawerState extends State<AppDrawer> {
         _selectedIndex = 5;
         break;
       case '/login':
+      case '/register':
         _selectedIndex = 6;
         break;
       default:
@@ -233,7 +236,9 @@ class _AppDrawerState extends State<AppDrawer> {
   }) {
     // Check if this is the current route
     final String currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
-    final bool isSelected = currentRoute == route;
+    
+    // Check if this item should be selected based on route or index
+    final bool isSelected = currentRoute == route || index == _selectedIndex;
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

@@ -16,12 +16,6 @@ class LoginPage extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home');
-          },
-        ),
       ),
       drawer: const AppDrawer(),
       body: const SingleChildScrollView(
@@ -284,12 +278,7 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegistrationPage(),
-                          ),
-                        );
+                        Navigator.pushReplacementNamed(context, '/register');
                       },
                       child: Text(
                         'Sign Up',
