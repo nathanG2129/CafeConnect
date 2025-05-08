@@ -7,60 +7,284 @@ class AppDrawer extends StatefulWidget {
   
   const AppDrawer({super.key, this.currentRoute});
 
+  /// Static method to preload drawer data in advance
+  /// Call this in your app initialization or in parent widgets
+  static Future<void> preloadDrawerData() async {
+    await AppDrawerState.preloadData();
+    return;
+  }
+
   @override
-  State<AppDrawer> createState() => _AppDrawerState();
+  State<AppDrawer> createState() => AppDrawerState();
 }
 
-class _AppDrawerState extends State<AppDrawer> {
-  final AuthService _authService = AuthService();
-  bool _isLoggedIn = false;
-  bool _isStaff = false;
-  int _selectedIndex = 0;
-  UserModel? _currentUser;
-
+class AppDrawerState extends State<AppDrawer> {
+  static final AuthService _authService = AuthService();
+  
+  // Static cache for drawer data
+  static Map<String, dynamic>? _cachedDrawerData;
+  static Future<Map<String, dynamic>>? _loadingFuture;
+  
+  late Future<Map<String, dynamic>> _drawerDataFuture;
+  
+  /// Static method to preload data that can be called from anywhere
+  static Future<Map<String, dynamic>> preloadData() async {
+    // If we're already loading, return that future
+    if (_loadingFuture != null) {
+      return _loadingFuture!;
+    }
+    
+    // Start loading and cache the future
+    _loadingFuture = _fetchDrawerData();
+    
+    try {
+      // Cache the result when done
+      _cachedDrawerData = await _loadingFuture!;
+      return _cachedDrawerData!;
+    } finally {
+      // Clear the loading future when done (success or error)
+      _loadingFuture = null;
+    }
+  }
+  
+  /// Static method to clear cached data (e.g., after logout)
+  static void clearCache() {
+    _cachedDrawerData = null;
+  }
+  
+  /// Actual data fetching logic
+  static Future<Map<String, dynamic>> _fetchDrawerData() async {
+    final isLoggedIn = _authService.isUserLoggedIn();
+    UserModel? currentUser;
+    bool isStaff = false;
+    
+    if (isLoggedIn) {
+      currentUser = await _authService.getCurrentUserData();
+      isStaff = currentUser?.role == 'staff';
+    }
+    
+    return {
+      'isLoggedIn': isLoggedIn,
+      'isStaff': isStaff,
+      'currentUser': currentUser,
+    };
+  }
+  
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
-    _loadUserData();
-  }
-
-  void _checkLoginStatus() {
-    setState(() {
-      _isLoggedIn = _authService.isUserLoggedIn();
-    });
-  }
-  
-  Future<void> _loadUserData() async {
-    if (_isLoggedIn) {
-      final user = await _authService.getCurrentUserData();
-      if (user != null) {
-        setState(() {
-          _currentUser = user;
-          _isStaff = user.role == 'staff';
-        });
-      }
-    }
+    // Use cached data if available, otherwise load it
+    _drawerDataFuture = _cachedDrawerData != null 
+        ? Future.value(_cachedDrawerData)
+        : preloadData();
   }
 
   @override
   Widget build(BuildContext context) {
     // Determine which page is currently active based on route
     final String currentRoute = widget.currentRoute ?? ModalRoute.of(context)?.settings.name ?? '/home';
-    _updateSelectedIndex(currentRoute);
+    
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _drawerDataFuture,
+      builder: (context, snapshot) {
+        // During first load, show a drawer with minimal animation
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Instead of a loading spinner, show a simplified drawer
+          // This makes the transition less jarring
+          return _buildSimplifiedDrawer(context);
+        }
+        
+        // If there's an error, show a simple drawer with minimal options
+        if (snapshot.hasError) {
+          return _buildErrorDrawer(context);
+        }
+        
+        // Extract data from snapshot
+        final data = snapshot.data!;
+        final bool isLoggedIn = data['isLoggedIn'];
+        final bool isStaff = data['isStaff'];
+        final UserModel? currentUser = data['currentUser'];
+        
+        // Update the cache if needed
+        if (_cachedDrawerData != data) {
+          _cachedDrawerData = data;
+        }
+        
+        // Build the full drawer with the loaded data
+        return _buildFullDrawer(context, currentRoute, isLoggedIn, isStaff, currentUser);
+      },
+    );
+  }
 
+  Widget _buildSimplifiedDrawer(BuildContext context) {
     return Drawer(
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
         children: [
-          DrawerHeaderWidget(currentUser: _currentUser),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 24,
+              bottom: 24,
+              left: 24,
+              right: 24,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.brown.shade900,
+                  Colors.brown.shade700,
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.coffee,
+                    size: 32,
+                    color: Colors.brown[700],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Cafe Connect',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Your Coffee Destination',
+                  style: TextStyle(
+                    color: Colors.brown[100],
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.home_outlined,
+                  customIcon: '☕',
+                  title: 'Home',
+                  index: 0,
+                  route: '/home',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/home');
+                  },
+                ),
+                // Just show a few basic items
+                _buildCategorySeparator("FEATURES"),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.restaurant_menu,
+                  customIcon: '🥐',
+                  title: 'Order Menu',
+                  index: 2,
+                  route: '/menu',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/menu');
+                  },
+                ),
+              ],
+            ),
+          ),
+          const DrawerFooterWidget(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFFF5E6D3),
+      child: Column(
+        children: [
+          DrawerHeaderWidget(currentUser: null),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.home_outlined,
+                  customIcon: '☕',
+                  title: 'Home',
+                  index: 0,
+                  route: '/home',
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/home');
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.refresh,
+                  customIcon: '🔄',
+                  title: 'Retry Connection',
+                  index: -1,
+                  route: '',
+                  onTap: () {
+                    setState(() {
+                      // Clear cache and try again
+                      clearCache();
+                      _drawerDataFuture = preloadData();
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          const DrawerFooterWidget(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFullDrawer(
+    BuildContext context, 
+    String currentRoute, 
+    bool isLoggedIn, 
+    bool isStaff, 
+    UserModel? currentUser
+  ) {
+    int selectedIndex = _getSelectedIndex(currentRoute);
+    
+    return Drawer(
+      backgroundColor: const Color(0xFFF5E6D3),
+      child: Column(
+        children: [
+          DrawerHeaderWidget(currentUser: currentUser),
           const SizedBox(height: 12),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
                 // HOME SECTION
-                if (_isStaff) 
+                if (isStaff) 
                   _buildDrawerItem(
                     context,
                     icon: Icons.dashboard_outlined,
@@ -85,7 +309,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     },
                   ),
                 
-                if (_isLoggedIn)
+                if (isLoggedIn)
                   _buildDrawerItem(
                     context,
                     icon: Icons.person_outline,
@@ -99,9 +323,9 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                 
                 // MAIN FEATURES
-                _buildCategorySeparator(_isStaff ? "MANAGEMENT" : "FEATURES"),
+                _buildCategorySeparator(isStaff ? "MANAGEMENT" : "FEATURES"),
                 
-                if (_isStaff) ...[
+                if (isStaff) ...[
                   _buildDrawerItem(
                     context,
                     icon: Icons.coffee,
@@ -125,7 +349,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       Navigator.pushReplacementNamed(context, '/menu');
                     },
                   ),
-                  if (_isLoggedIn)
+                  if (isLoggedIn)
                     _buildDrawerItem(
                       context,
                       icon: Icons.receipt_long,
@@ -169,7 +393,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 // ACCOUNT SECTION
                 _buildCategorySeparator("ACCOUNT"),
                 
-                if (_isLoggedIn)
+                if (isLoggedIn)
                   _buildDrawerItem(
                     context,
                     icon: Icons.logout_outlined,
@@ -180,11 +404,13 @@ class _AppDrawerState extends State<AppDrawer> {
                     onTap: () async {
                       await _authService.signOut();
                       if (!mounted) return;
+                      
+                      // Clear cache and reload data
+                      clearCache();
                       setState(() {
-                        _isLoggedIn = false;
-                        _isStaff = false;
-                        _currentUser = null;
+                        _drawerDataFuture = preloadData();
                       });
+                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('You have been signed out'),
@@ -215,34 +441,28 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  // Method to update the selected index based on the current route
-  void _updateSelectedIndex(String currentRoute) {
+  // Method to get the selected index based on the current route
+  int _getSelectedIndex(String currentRoute) {
     switch (currentRoute) {
       case '/home':
       case '/staff-dashboard':
-        _selectedIndex = 0;
-        break;
+        return 0;
       case '/profile':
-        _selectedIndex = 1;
-        break;
+        return 1;
       case '/menu':
-        _selectedIndex = 2;
-        break;
+      case '/manage-products':
+        return 2;
       case '/order-history':
-        _selectedIndex = 3;
-        break;
+        return 3;
       case '/guide':
-        _selectedIndex = 4;
-        break;
+        return 4;
       case '/about':
-        _selectedIndex = 5;
-        break;
+        return 5;
       case '/login':
       case '/register':
-        _selectedIndex = 6;
-        break;
+        return 6;
       default:
-        _selectedIndex = 0;
+        return 0;
     }
   }
 
@@ -292,7 +512,7 @@ class _AppDrawerState extends State<AppDrawer> {
     final String currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
     
     // Check if this item should be selected based on route or index
-    final bool isSelected = currentRoute == route || index == _selectedIndex;
+    final bool isSelected = currentRoute == route || index == _getSelectedIndex(currentRoute);
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -348,8 +568,7 @@ class DrawerHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = AuthService();
-    final bool isLoggedIn = authService.isUserLoggedIn();
+    final bool isLoggedIn = currentUser != null;
     final bool isStaff = currentUser?.role == 'staff';
     
     return Container(
