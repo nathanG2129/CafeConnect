@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../widgets/app_drawer.dart';
 import '../../services/auth_service.dart';
 import '../../models/userModel.dart';
+import '../../services/product_service.dart';
+import '../../services/order_service.dart';
+import '../../models/orderModel.dart';
 
 class StaffDashboardPage extends StatefulWidget {
   static const String routeName = '/staff-dashboard';
@@ -14,35 +17,78 @@ class StaffDashboardPage extends StatefulWidget {
 
 class _StaffDashboardPageState extends State<StaffDashboardPage> {
   final AuthService _authService = AuthService();
+  final ProductService _productService = ProductService();
+  final OrderService _orderService = OrderService();
+  
   UserModel? _currentUser;
   bool _isLoading = true;
 
-  // Sample data - In a real app, these would come from API/database
-  final int _totalProducts = 24;
-  final int _pendingOrders = 7;
-  final double _todaySales = 523.50;
+  // Data to be fetched
+  int _totalProducts = 0;
+  int _pendingOrders = 0;
+  double _todaySales = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadData();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
     });
     
     try {
-      final user = await _authService.getCurrentUserData();
-      setState(() {
-        _currentUser = user;
-        _isLoading = false;
-      });
+      // Load multiple data sources in parallel
+      final userFuture = _authService.getCurrentUserData();
+      final productsFuture = _productService.getAllProducts();
+      final ordersFuture = _orderService.getAllOrders();
+      
+      // Wait for all futures to complete
+      final results = await Future.wait([
+        userFuture,
+        productsFuture,
+        ordersFuture,
+      ]);
+      
+      // Process results
+      final user = results[0] as UserModel?;
+      final products = results[1] as List;
+      final orders = results[2] as List<OrderModel>;
+      
+      // Calculate statistics
+      final pendingOrders = orders.where((order) => order.status == 'Pending').length;
+      
+      // Calculate today's sales from completed orders
+      final now = DateTime.now();
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final todaySales = orders
+        .where((order) => order.status == 'Completed' && order.orderDate.isAfter(todayStart))
+        .fold(0.0, (sum, order) => sum + order.totalAmount);
+      
+      if (mounted) {
+        setState(() {
+          _currentUser = user;
+          _totalProducts = products.length;
+          _pendingOrders = pendingOrders;
+          _todaySales = todaySales;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading dashboard data: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -59,7 +105,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadUserData,
+            onPressed: _loadData,
             tooltip: 'Refresh',
           ),
         ],
@@ -114,8 +160,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStaffHeader(),
-                  const SizedBox(height: 32),
-                  _buildActivitySummary(),
                 ],
               ),
             ),
@@ -132,8 +176,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                 _buildStatisticsSection(isHorizontal: true),
                 const SizedBox(height: 24),
                 _buildQuickAccessPanel(isDesktop: true),
-                const SizedBox(height: 24),
-                _buildNotificationsSection(),
               ],
             ),
           ),
@@ -154,10 +196,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             _buildStatisticsSection(isHorizontal: true),
             const SizedBox(height: 24),
             _buildQuickAccessPanel(isDesktop: false),
-            const SizedBox(height: 24),
-            _buildActivitySummary(),
-            const SizedBox(height: 24),
-            _buildNotificationsSection(),
           ],
         ),
       ),
@@ -176,10 +214,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             _buildStatisticsSection(isHorizontal: false),
             const SizedBox(height: 24),
             _buildQuickAccessPanel(isDesktop: false),
-            const SizedBox(height: 24),
-            _buildActivitySummary(),
-            const SizedBox(height: 24),
-            _buildNotificationsSection(),
           ],
         ),
       ),
@@ -235,142 +269,22 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[700],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        "Staff Portal",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Last login: Today, 9:30 AM",
-                      style: TextStyle(
-                        color: Colors.brown[100],
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivitySummary() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Recent Activity",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.brown[800],
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildActivityItem(
-              icon: Icons.update,
-              title: "Menu Updated",
-              description: "You updated the Espresso price",
-              time: "Today, 10:45 AM",
-              iconColor: Colors.blue[700]!,
-            ),
-            _buildActivityItem(
-              icon: Icons.check_circle,
-              title: "Order Completed",
-              description: "Order #1234 was completed",
-              time: "Today, 9:30 AM",
-              iconColor: Colors.green[600]!,
-            ),
-            _buildActivityItem(
-              icon: Icons.local_offer,
-              title: "New Special Added",
-              description: "Weekend Special discount created",
-              time: "Yesterday, 5:20 PM",
-              iconColor: Colors.orange[600]!,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActivityItem({
-    required IconData icon,
-    required String title,
-    required String description,
-    required String time,
-    required Color iconColor,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.amber[700],
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
+                  child: const Text(
+                    "Staff Portal",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ],
-            ),
-          ),
-          Text(
-            time,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
             ),
           ),
         ],
@@ -607,136 +521,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationsSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Notifications",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown[800],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "View All",
-                    style: TextStyle(
-                      color: Colors.brown[600],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildNotificationItem(
-              title: "New Order #1237",
-              message: "John D. placed a new order with 3 items",
-              time: "Just now",
-              isNew: true,
-            ),
-            _buildNotificationItem(
-              title: "Low Inventory Alert",
-              message: "Arabica Coffee is running low on stock",
-              time: "1 hour ago",
-              isNew: true,
-            ),
-            _buildNotificationItem(
-              title: "Staff Meeting",
-              message: "Weekly staff meeting at 5PM today",
-              time: "3 hours ago",
-              isNew: false,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationItem({
-    required String title,
-    required String message,
-    required String time,
-    required bool isNew,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            margin: const EdgeInsets.only(top: 5),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isNew ? Colors.amber[700] : Colors.transparent,
-              border: Border.all(
-                color: isNew ? Colors.amber[700]! : Colors.grey.withOpacity(0.5),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: isNew ? FontWeight.bold : FontWeight.normal,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      time,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
