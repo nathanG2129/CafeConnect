@@ -67,11 +67,82 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
       drawer: const AppDrawer(currentRoute: '/staff-dashboard'),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.brown))
-          : _buildDashboard(),
+          : _buildResponsiveLayout(),
     );
   }
 
-  Widget _buildDashboard() {
+  Widget _buildResponsiveLayout() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 1100) {
+          // Desktop layout
+          return _buildDesktopLayout();
+        } else if (constraints.maxWidth >= 650) {
+          // Tablet layout
+          return _buildTabletLayout();
+        } else {
+          // Mobile layout
+          return _buildMobileLayout();
+        }
+      },
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Side panel with staff info
+        Expanded(
+          flex: 3,
+          child: Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.brown.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStaffHeader(),
+                  const SizedBox(height: 32),
+                  _buildActivitySummary(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // Main content area
+        Expanded(
+          flex: 7,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildStatisticsSection(isHorizontal: true),
+                const SizedBox(height: 24),
+                _buildQuickAccessPanel(isDesktop: true),
+                const SizedBox(height: 24),
+                _buildNotificationsSection(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout() {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -80,9 +151,35 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
           children: [
             _buildStaffHeader(),
             const SizedBox(height: 24),
-            _buildQuickAccessPanel(),
+            _buildStatisticsSection(isHorizontal: true),
             const SizedBox(height: 24),
-            _buildStatisticsSection(),
+            _buildQuickAccessPanel(isDesktop: false),
+            const SizedBox(height: 24),
+            _buildActivitySummary(),
+            const SizedBox(height: 24),
+            _buildNotificationsSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStaffHeader(),
+            const SizedBox(height: 24),
+            _buildStatisticsSection(isHorizontal: false),
+            const SizedBox(height: 24),
+            _buildQuickAccessPanel(isDesktop: false),
+            const SizedBox(height: 24),
+            _buildActivitySummary(),
+            const SizedBox(height: 24),
+            _buildNotificationsSection(),
           ],
         ),
       ),
@@ -94,8 +191,15 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.brown[800],
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.brown[800]!,
+            Colors.brown[700]!,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.brown.withOpacity(0.3),
@@ -109,14 +213,14 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
         children: [
           CircleAvatar(
             backgroundColor: Colors.amber[200],
-            radius: 30,
+            radius: 36,
             child: Icon(
               Icons.person,
               color: Colors.brown[800],
-              size: 36,
+              size: 40,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,13 +234,33 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Staff Portal",
-                  style: TextStyle(
-                    color: Colors.amber[200],
-                    fontSize: 16,
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[700],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        "Staff Portal",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Last login: Today, 9:30 AM",
+                      style: TextStyle(
+                        color: Colors.brown[100],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -146,14 +270,122 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
     );
   }
 
-  Widget _buildQuickAccessPanel() {
+  Widget _buildActivitySummary() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Recent Activity",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown[800],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildActivityItem(
+              icon: Icons.update,
+              title: "Menu Updated",
+              description: "You updated the Espresso price",
+              time: "Today, 10:45 AM",
+              iconColor: Colors.blue[700]!,
+            ),
+            _buildActivityItem(
+              icon: Icons.check_circle,
+              title: "Order Completed",
+              description: "Order #1234 was completed",
+              time: "Today, 9:30 AM",
+              iconColor: Colors.green[600]!,
+            ),
+            _buildActivityItem(
+              icon: Icons.local_offer,
+              title: "New Special Added",
+              description: "Weekend Special discount created",
+              time: "Yesterday, 5:20 PM",
+              iconColor: Colors.orange[600]!,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivityItem({
+    required IconData icon,
+    required String title,
+    required String description,
+    required String time,
+    required Color iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            time,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessPanel({required bool isDesktop}) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -165,22 +397,24 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                 color: Colors.brown[800],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             LayoutBuilder(
               builder: (context, constraints) {
                 // Adapt to available width
-                final crossAxisCount = constraints.maxWidth > 450 ? 3 : 2;
+                final crossAxisCount = isDesktop ? 3 : constraints.maxWidth > 450 ? 3 : 2;
+                final aspectRatio = isDesktop ? 1.5 : 1.2;
+                
                 return GridView.count(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisCount: crossAxisCount,
-                  childAspectRatio: 1.2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+                  childAspectRatio: aspectRatio,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
                   children: [
                     _buildQuickAccessItem(
                       icon: Icons.coffee,
-                      title: "Products",
+                      title: "Manage Products",
                       color: Colors.amber[700]!,
                       onTap: () {
                         Navigator.pushReplacementNamed(context, '/manage-products');
@@ -188,7 +422,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                     ),
                     _buildQuickAccessItem(
                       icon: Icons.receipt_long,
-                      title: "Orders",
+                      title: "Manage Orders",
                       color: Colors.green[600]!,
                       onTap: () {
                         Navigator.pushReplacementNamed(context, '/manage-orders');
@@ -196,7 +430,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                     ),
                     _buildQuickAccessItem(
                       icon: Icons.local_offer,
-                      title: "Specials",
+                      title: "Special Offers",
                       color: Colors.orange[600]!,
                       onTap: () {
                         Navigator.pushReplacementNamed(context, '/manage-specials');
@@ -220,13 +454,20 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: color.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.1),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -234,16 +475,16 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             Icon(
               icon,
               color: color,
-              size: 28,
+              size: 36,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 12),
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: color,
+                color: color.withOpacity(0.9),
                 fontWeight: FontWeight.bold,
-                fontSize: 13,
+                fontSize: 15,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -253,117 +494,64 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
     );
   }
 
-  Widget _buildStatisticsSection() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "System Status",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.brown[800],
-              ),
+  Widget _buildStatisticsSection({required bool isHorizontal}) {
+    if (isHorizontal) {
+      return Row(
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              title: "Products",
+              value: "$_totalProducts",
+              icon: Icons.coffee,
+              color: Colors.amber[700]!,
             ),
-            const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // Use single column layout for small screens
-                if (constraints.maxWidth < 400) {
-                  return Column(
-                    children: [
-                      _buildStatCard(
-                        title: "Products",
-                        value: "$_totalProducts",
-                        icon: Icons.coffee,
-                        color: Colors.amber[700]!,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildStatCard(
-                        title: "Pending Orders",
-                        value: "$_pendingOrders",
-                        icon: Icons.hourglass_bottom,
-                        color: Colors.orange[600]!,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildStatCard(
-                        title: "Today's Sales",
-                        value: "₱${_todaySales.toStringAsFixed(2)}",
-                        icon: Icons.attach_money,
-                        color: Colors.green[600]!,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildStatCard(
-                        title: "System Status",
-                        value: "Online",
-                        icon: Icons.cloud_done,
-                        color: Colors.blue[600]!,
-                      ),
-                    ],
-                  );
-                }
-                
-                // Use two-column layout for larger screens
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            title: "Products",
-                            value: "$_totalProducts",
-                            icon: Icons.coffee,
-                            color: Colors.amber[700]!,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildStatCard(
-                            title: "Pending Orders",
-                            value: "$_pendingOrders",
-                            icon: Icons.hourglass_bottom,
-                            color: Colors.orange[600]!,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            title: "Today's Sales",
-                            value: "₱${_todaySales.toStringAsFixed(2)}",
-                            icon: Icons.attach_money,
-                            color: Colors.green[600]!,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildStatCard(
-                            title: "System Status",
-                            value: "Online",
-                            icon: Icons.cloud_done,
-                            color: Colors.blue[600]!,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              }
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _buildStatCard(
+              title: "Pending Orders",
+              value: "$_pendingOrders",
+              icon: Icons.receipt_long,
+              color: Colors.green[600]!,
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _buildStatCard(
+              title: "Today's Sales",
+              value: "₱${_todaySales.toStringAsFixed(2)}",
+              icon: Icons.attach_money,
+              color: Colors.purple[600]!,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          _buildStatCard(
+            title: "Products",
+            value: "$_totalProducts",
+            icon: Icons.coffee,
+            color: Colors.amber[700]!,
+          ),
+          const SizedBox(height: 16),
+          _buildStatCard(
+            title: "Pending Orders",
+            value: "$_pendingOrders",
+            icon: Icons.receipt_long,
+            color: Colors.green[600]!,
+          ),
+          const SizedBox(height: 16),
+          _buildStatCard(
+            title: "Today's Sales",
+            value: "₱${_todaySales.toStringAsFixed(2)}",
+            icon: Icons.attach_money,
+            color: Colors.purple[600]!,
+          ),
+        ],
+      );
+    }
   }
 
   Widget _buildStatCard({
@@ -372,46 +560,181 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
     required IconData icon,
     required Color color,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              Icon(
+              child: Icon(
                 icon,
                 color: color,
-                size: 20,
+                size: 28,
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.brown[800],
             ),
-            overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown[800],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationsSection() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Notifications",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown[800],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "View All",
+                    style: TextStyle(
+                      color: Colors.brown[600],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildNotificationItem(
+              title: "New Order #1237",
+              message: "John D. placed a new order with 3 items",
+              time: "Just now",
+              isNew: true,
+            ),
+            _buildNotificationItem(
+              title: "Low Inventory Alert",
+              message: "Arabica Coffee is running low on stock",
+              time: "1 hour ago",
+              isNew: true,
+            ),
+            _buildNotificationItem(
+              title: "Staff Meeting",
+              message: "Weekly staff meeting at 5PM today",
+              time: "3 hours ago",
+              isNew: false,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationItem({
+    required String title,
+    required String message,
+    required String time,
+    required bool isNew,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            margin: const EdgeInsets.only(top: 5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isNew ? Colors.amber[700] : Colors.transparent,
+              border: Border.all(
+                color: isNew ? Colors.amber[700]! : Colors.grey.withOpacity(0.5),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: isNew ? FontWeight.bold : FontWeight.normal,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

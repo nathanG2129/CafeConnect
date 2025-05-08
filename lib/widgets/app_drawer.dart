@@ -286,7 +286,7 @@ class AppDrawerState extends State<AppDrawer> {
                     context,
                     icon: Icons.dashboard_outlined,
                     customIcon: '📊',
-                    title: 'Staff Dashboard',
+                    title: 'Dashboard',
                     index: 0,
                     route: '/staff-dashboard',
                     onTap: () {
@@ -336,6 +336,20 @@ class AppDrawerState extends State<AppDrawer> {
                   ),
                   _buildDrawerItem(
                     context,
+                    icon: Icons.local_offer_outlined,
+                    customIcon: '🏷️',
+                    title: 'Manage Specials',
+                    index: 4,
+                    route: '/manage-specials',
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/manage-specials');
+                    },
+                  ),
+                  
+                  _buildCategorySeparator("ORDERS"),
+                  
+                  _buildDrawerItem(
+                    context,
                     icon: Icons.receipt_long,
                     customIcon: '📋',
                     title: 'Manage Orders',
@@ -343,17 +357,6 @@ class AppDrawerState extends State<AppDrawer> {
                     route: '/manage-orders',
                     onTap: () {
                       Navigator.pushReplacementNamed(context, '/manage-orders');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.price_change,
-                    customIcon: '💰',
-                    title: 'Update Menu Pricing',
-                    index: 7,
-                    route: '/update-pricing',
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, '/update-pricing');
                     },
                   ),
                 ] else ...[
@@ -475,6 +478,7 @@ class AppDrawerState extends State<AppDrawer> {
       case '/manage-orders':
         return 3;
       case '/guide':
+      case '/manage-specials':
         return 4;
       case '/about':
         return 5;
