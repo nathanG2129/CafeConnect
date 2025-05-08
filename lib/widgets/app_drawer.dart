@@ -8,7 +8,6 @@ class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key, this.currentRoute});
 
   /// Static method to preload drawer data in advance
-  /// Call this in your app initialization or in parent widgets
   static Future<void> preloadDrawerData() async {
     await AppDrawerState.preloadData();
     return;
