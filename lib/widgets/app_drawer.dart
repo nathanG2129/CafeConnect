@@ -224,7 +224,7 @@ class AppDrawerState extends State<AppDrawer> {
       backgroundColor: const Color(0xFFF5E6D3),
       child: Column(
         children: [
-          DrawerHeaderWidget(currentUser: null),
+          const DrawerHeaderWidget(currentUser: null),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,

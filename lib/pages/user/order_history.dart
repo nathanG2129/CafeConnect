@@ -223,6 +223,46 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   Widget _buildOrderCard(OrderModel order) {
     final timeStr = DateFormat('h:mm a').format(order.orderDate);
     
+    // Status color mapping to match manage_orders_page.dart
+    Color getStatusColor(String status) {
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return Colors.orange;
+        case 'preparing':
+          return Colors.blue;
+        case 'ready':
+          return Colors.green;
+        case 'completed':
+          return Colors.purple;
+        case 'cancelled':
+          return Colors.red;
+        default:
+          return Colors.grey;
+      }
+    }
+    
+    // Get status icon to match manage_orders_page.dart
+    IconData getStatusIcon(String status) {
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return Icons.hourglass_empty;
+        case 'preparing':
+          return Icons.coffee;
+        case 'ready':
+          return Icons.done_all;
+        case 'completed':
+          return Icons.check_circle;
+        case 'cancelled':
+          return Icons.cancel;
+        default:
+          return Icons.help_outline;
+      }
+    }
+    
+    // Check if order can be cancelled (only pending or preparing orders)
+    bool canCancel = order.status.toLowerCase() == 'pending' || 
+                    order.status.toLowerCase() == 'preparing';
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
@@ -283,6 +323,33 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: getStatusColor(order.status),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    getStatusIcon(order.status),
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    order.status,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const Divider(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -305,20 +372,40 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               ],
             ),
             const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _reorderItem(order),
-                icon: const Icon(Icons.replay),
-                label: const Text('Reorder'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.brown[700],
-                  side: BorderSide(color: Colors.brown[700]!),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _reorderItem(order),
+                    icon: const Icon(Icons.replay),
+                    label: const Text('Reorder'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.brown[700],
+                      side: BorderSide(color: Colors.brown[700]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                if (canCancel) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showCancelConfirmation(order),
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: const Text('Cancel'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red[700],
+                        side: BorderSide(color: Colors.red[700]!),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),
@@ -341,5 +428,103 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         backgroundColor: Colors.green[600],
       ),
     );
+  }
+
+  // Show cancel confirmation dialog
+  Future<void> _showCancelConfirmation(OrderModel order) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Order'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to cancel your order for ${order.coffeeName}?'),
+                const SizedBox(height: 8),
+                Text(
+                  'This action cannot be undone.',
+                  style: TextStyle(
+                    color: Colors.red[700],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'No, Keep Order',
+                style: TextStyle(color: Colors.brown[700]),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Yes, Cancel Order',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _cancelOrder(order);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Cancel the order
+  Future<void> _cancelOrder(OrderModel order) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final success = await _orderService.updateOrderStatus(order.id, 'Cancelled');
+      
+      if (!mounted) return;
+      
+      if (success) {
+        // Refresh orders list
+        await _loadOrders();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Your order for ${order.coffeeName} has been cancelled'),
+            backgroundColor: Colors.green[600],
+          ),
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Failed to cancel order. Please try again.'),
+            backgroundColor: Colors.red[600],
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      
+      setState(() {
+        _isLoading = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error cancelling order: ${e.toString()}'),
+          backgroundColor: Colors.red[600],
+        ),
+      );
+    }
   }
 } 

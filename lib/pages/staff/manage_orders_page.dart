@@ -125,19 +125,19 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
           indicatorWeight: 3,
           tabs: [
             Tab(
-              icon: Icon(Icons.hourglass_empty),
+              icon: const Icon(Icons.hourglass_empty),
               text: 'Pending (${_pendingOrders.length})',
             ),
             Tab(
-              icon: Icon(Icons.coffee),
+              icon: const Icon(Icons.coffee),
               text: 'Preparing (${_preparingOrders.length})',
             ),
             Tab(
-              icon: Icon(Icons.done_all),
+              icon: const Icon(Icons.done_all),
               text: 'Ready (${_readyOrders.length})',
             ),
             Tab(
-              icon: Icon(Icons.check_circle),
+              icon: const Icon(Icons.check_circle),
               text: 'Completed (${_completedOrders.length})',
             ),
           ],
@@ -158,7 +158,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                   child: Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.amber,
                       shape: BoxShape.circle,
                     ),
