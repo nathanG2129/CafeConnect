@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Flutter Activity 1",
+      title: "CafeConnect",
       theme: ThemeData(
         primarySwatch: Colors.brown,
         scaffoldBackgroundColor: const Color(0xFFF5E6D3),

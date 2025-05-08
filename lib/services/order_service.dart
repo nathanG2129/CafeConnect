@@ -17,15 +17,7 @@ class OrderService {
       // Create new order with current user ID
       final updatedOrder = order.copyWith(userId: currentUser.uid);
 
-      // Add order to the orders collection under the user's document
-      await _firestore
-          .collection('users')
-          .doc(currentUser.uid)
-          .collection('orders')
-          .doc(order.id)
-          .set(updatedOrder.toMap());
-
-      // Also add to the global orders collection for staff access
+      // Add to the global orders collection only
       await _firestore
           .collection('orders')
           .doc(order.id)
@@ -46,11 +38,10 @@ class OrderService {
         return []; // User not logged in
       }
 
-      // Get orders from the orders subcollection
+      // Get orders from the global collection where userId matches current user
       QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .doc(currentUser.uid)
           .collection('orders')
+          .where('userId', isEqualTo: currentUser.uid)
           .orderBy('orderDate', descending: true)
           .get();
 
@@ -73,15 +64,22 @@ class OrderService {
         return false; // User not logged in
       }
 
-      // Delete the order document from user's collection
-      await _firestore
-          .collection('users')
-          .doc(currentUser.uid)
+      // Get the order to check if user is authorized to delete it
+      DocumentSnapshot orderDoc = await _firestore
           .collection('orders')
           .doc(orderId)
-          .delete();
+          .get();
+      
+      if (!orderDoc.exists) {
+        return false;
+      }
+      
+      Map<String, dynamic> orderData = orderDoc.data() as Map<String, dynamic>;
+      if (orderData['userId'] != currentUser.uid) {
+        return false; // Not authorized to delete this order
+      }
 
-      // Delete from global orders collection
+      // Delete from global orders collection only
       await _firestore
           .collection('orders')
           .doc(orderId)
@@ -138,32 +136,8 @@ class OrderService {
   // Update order status
   Future<bool> updateOrderStatus(String orderId, String newStatus) async {
     try {
-      // Get the order first to preserve all fields
-      DocumentSnapshot orderDoc = await _firestore
-          .collection('orders')
-          .doc(orderId)
-          .get();
-
-      if (!orderDoc.exists) {
-        return false;
-      }
-
-      Map<String, dynamic> orderData = orderDoc.data() as Map<String, dynamic>;
-      OrderModel order = OrderModel.fromMap(orderData);
-      
-      // Create updated order with new status
-      OrderModel updatedOrder = order.copyWith(status: newStatus);
-      
-      // Update in global orders collection
+      // Update only in global orders collection
       await _firestore
-          .collection('orders')
-          .doc(orderId)
-          .update({'status': newStatus});
-      
-      // Also update in user's orders collection
-      await _firestore
-          .collection('users')
-          .doc(order.userId)
           .collection('orders')
           .doc(orderId)
           .update({'status': newStatus});
