@@ -60,7 +60,6 @@ class SpecialService {
       
       return activeSpecials;
     } catch (e) {
-      print('Error getting active specials: $e');
       return [];
     }
   }

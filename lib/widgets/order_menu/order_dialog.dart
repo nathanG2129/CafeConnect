@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderItemModel.dart';
 import 'package:flutter_activity1/models/productModel.dart';
+import 'package:flutter_activity1/models/specialModel.dart';
 import 'dart:math';
 
 class OrderDialog extends StatefulWidget {
   final ProductModel product;
+  final Map<String, dynamic>? discountInfo;
   final Function(OrderItemModel) onAddToCart;
 
   const OrderDialog({
     super.key,
     required this.product,
+    this.discountInfo,
     required this.onAddToCart,
   });
 
@@ -22,6 +25,12 @@ class _OrderDialogState extends State<OrderDialog> {
   String? selectedAddOn;
   int quantity = 1;
   bool showSizeError = false;
+  
+  // Get discount information
+  bool get hasDiscount => widget.discountInfo?['hasDiscount'] == true;
+  double get originalPrice => widget.product.basePrice;
+  double get discountedBasePrice => hasDiscount ? widget.discountInfo!['finalPrice'] : originalPrice;
+  SpecialModel? get special => widget.discountInfo?['special'];
 
   // Get price modifiers
   double getSizePrice(String? size) {
@@ -43,7 +52,7 @@ class _OrderDialogState extends State<OrderDialog> {
   }
 
   double get totalPrice {
-    double basePrice = widget.product.basePrice;
+    double basePrice = discountedBasePrice;
     basePrice += getSizePrice(selectedSize);
     basePrice += getAddOnPrice(selectedAddOn);
     return basePrice * quantity;
@@ -67,7 +76,7 @@ class _OrderDialogState extends State<OrderDialog> {
       size: selectedSize!,
       addOn: selectedAddOn,
       quantity: quantity,
-      basePrice: widget.product.basePrice,
+      basePrice: discountedBasePrice, // Use discounted base price
       totalPrice: totalPrice,
       imagePath: widget.product.imagePath,
     );
@@ -149,6 +158,38 @@ class _OrderDialogState extends State<OrderDialog> {
                     ),
                   ),
                 ),
+                // Special badge if applicable
+                if (hasDiscount)
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.local_offer,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            special!.getDiscountDescription(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
             Padding(
@@ -170,17 +211,40 @@ class _OrderDialogState extends State<OrderDialog> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Text(
-                          'Base: ₱${widget.product.basePrice.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.brown[700],
-                            fontWeight: FontWeight.w500,
+                      if (hasDiscount)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Base: ₱${originalPrice.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                decoration: TextDecoration.lineThrough,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              'Special: ₱${discountedBasePrice.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red[700],
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            'Base: ₱${widget.product.basePrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.brown[700],
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -249,122 +313,120 @@ class _OrderDialogState extends State<OrderDialog> {
                     value: selectedSize,
                     decoration: InputDecoration(
                       labelText: 'Size *',
-                      border: const OutlineInputBorder(),
+                      labelStyle: TextStyle(
+                        color: showSizeError ? Colors.red : Colors.brown,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          color: showSizeError ? Colors.red : Colors.brown,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          color: showSizeError ? Colors.red : Colors.brown,
+                        ),
+                      ),
                       errorText: showSizeError ? 'Please select a size' : null,
-                      helperText: 'Select a size for your beverage',
                     ),
-                    items: widget.product.sizes.map((Map<String, dynamic> size) {
-                      final name = size['name'];
-                      final price = size['price'] as double;
-                      return DropdownMenuItem<String>(
-                        value: name,
-                        child: Text('$name ${price > 0 ? "(+₱${price.toStringAsFixed(2)})" : ""}'),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
+                    onChanged: (value) {
                       setState(() {
                         selectedSize = value;
                         showSizeError = false;
                       });
                     },
+                    items: widget.product.sizes.map((size) {
+                      return DropdownMenuItem<String>(
+                        value: size['name'] as String,
+                        child: Text(
+                          '${size['name']} (+₱${size['price'].toStringAsFixed(2)})',
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 16),
 
                   // Add-ons Selection
                   DropdownButtonFormField<String>(
                     value: selectedAddOn,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Add-ons (Optional)',
-                      border: OutlineInputBorder(),
-                      helperText: 'Customize your drink with extra toppings',
+                      labelStyle: const TextStyle(
+                        color: Colors.brown,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    items: widget.product.addOns.map((Map<String, dynamic> addOn) {
-                      final name = addOn['name'];
-                      final price = addOn['price'] as double;
-                      return DropdownMenuItem<String>(
-                        value: name,
-                        child: Text('$name (+₱${price.toStringAsFixed(2)})'),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
+                    onChanged: (value) {
                       setState(() {
                         selectedAddOn = value;
                       });
                     },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Total Price Display
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.brown[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.brown[200]!),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Total Price:',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.brown,
-                          ),
-                        ),
-                        Text(
-                          '₱${totalPrice.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.brown[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: BorderSide(color: Colors.brown[700]!),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Colors.brown[700],
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: Text('None'),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _handleAddToCart,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown[700],
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      ...widget.product.addOns.map((addOn) {
+                        return DropdownMenuItem<String>(
+                          value: addOn['name'] as String,
+                          child: Text(
+                            '${addOn['name']} (+₱${addOn['price'].toStringAsFixed(2)})',
+                            style: const TextStyle(
+                              fontSize: 16,
                             ),
                           ),
-                          child: const Text(
-                            'Add to Cart',
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Total Price and Add to Cart Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Total Price:',
                             style: TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: Colors.brown,
                             ),
+                          ),
+                          Text(
+                            '₱${totalPrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: hasDiscount ? Colors.red[700] : Colors.brown[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: _handleAddToCart,
+                        icon: const Icon(Icons.add_shopping_cart),
+                        label: const Text('Add to Cart'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.brown[700],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),

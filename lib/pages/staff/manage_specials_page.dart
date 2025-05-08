@@ -601,21 +601,21 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
                             const SizedBox(height: 4),
                             SegmentedButton<DiscountType>(
                               segments: [
-                                ButtonSegment<DiscountType>(
+                                const ButtonSegment<DiscountType>(
                                   value: DiscountType.fixedPrice,
-                                  label: const Text('Fixed Price'),
-                                  icon: const Icon(Icons.money),
+                                  label: Text('Fixed Price'),
+                                  icon: Icon(Icons.money),
                                 ),
                                 if (_selectedProduct != null) ...[
-                                  ButtonSegment<DiscountType>(
+                                  const ButtonSegment<DiscountType>(
                                     value: DiscountType.percentOff,
-                                    label: const Text('% Off'),
-                                    icon: const Icon(Icons.percent),
+                                    label: Text('% Off'),
+                                    icon: Icon(Icons.percent),
                                   ),
-                                  ButtonSegment<DiscountType>(
+                                  const ButtonSegment<DiscountType>(
                                     value: DiscountType.amountOff,
-                                    label: const Text('Amount Off'),
-                                    icon: const Icon(Icons.remove),
+                                    label: Text('Amount Off'),
+                                    icon: Icon(Icons.remove),
                                   ),
                                 ],
                               ],

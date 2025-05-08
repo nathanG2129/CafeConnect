@@ -79,8 +79,6 @@ class SpecialModel {
         return 'percentOff';
       case DiscountType.amountOff:
         return 'amountOff';
-      default:
-        return 'fixedPrice';
     }
   }
 

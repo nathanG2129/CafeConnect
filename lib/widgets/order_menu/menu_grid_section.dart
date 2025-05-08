@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderItemModel.dart';
 import 'package:flutter_activity1/models/productModel.dart';
+import 'package:flutter_activity1/models/specialModel.dart';
 import 'package:flutter_activity1/services/product_service.dart';
+import 'package:flutter_activity1/services/discount_service.dart';
 import 'package:flutter_activity1/widgets/order_menu/order_dialog.dart';
 
 class MenuGridSection extends StatefulWidget {
@@ -18,7 +20,9 @@ class MenuGridSection extends StatefulWidget {
 
 class _MenuGridSectionState extends State<MenuGridSection> {
   final ProductService _productService = ProductService();
+  final DiscountService _discountService = DiscountService();
   List<ProductModel> _products = [];
+  Map<String, Map<String, dynamic>> _productDiscounts = {};
   bool _isLoading = true;
 
   @override
@@ -31,13 +35,22 @@ class _MenuGridSectionState extends State<MenuGridSection> {
     if (!mounted) return;
     setState(() {
       _isLoading = true;
+      _productDiscounts = {};
     });
 
     try {
       final products = await _productService.getAvailableProducts();
+      
+      // Calculate discounts for each product
+      final Map<String, Map<String, dynamic>> discounts = {};
+      for (var product in products) {
+        discounts[product.id] = await _discountService.calculateDiscountedPrice(product);
+      }
+      
       if (mounted) {
         setState(() {
           _products = products;
+          _productDiscounts = discounts;
           _isLoading = false;
         });
       }
@@ -180,26 +193,67 @@ class _MenuGridSectionState extends State<MenuGridSection> {
   }
 
   Widget _buildProductsGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: _products.length,
-      itemBuilder: (context, index) {
-        final product = _products[index];
-        return _buildProductCard(context, product);
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Only show this section if there are products with discounts
+        if (_productDiscounts.values.any((discount) => discount['hasDiscount'] == true))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.local_offer, color: Colors.amber[800], size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Special offers automatically applied!',
+                      style: TextStyle(
+                        color: Colors.amber[900],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.75,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: _products.length,
+          itemBuilder: (context, index) {
+            final product = _products[index];
+            final discountInfo = _productDiscounts[product.id];
+            return _buildProductCard(context, product, discountInfo);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildProductCard(BuildContext context, ProductModel product) {
+  Widget _buildProductCard(BuildContext context, ProductModel product, Map<String, dynamic>? discountInfo) {
+    final bool hasDiscount = discountInfo?['hasDiscount'] == true;
+    final double originalPrice = product.basePrice;
+    final double finalPrice = discountInfo?['finalPrice'] ?? originalPrice;
+    final SpecialModel? special = discountInfo?['special'];
+    
     return GestureDetector(
-      onTap: () => _showOrderDialog(context, product),
+      onTap: () => _showOrderDialog(context, product, discountInfo),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -216,15 +270,38 @@ class _MenuGridSectionState extends State<MenuGridSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.asset(
-                  product.imagePath,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.asset(
+                    product.imagePath,
+                    width: double.infinity,
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
+                if (hasDiscount)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        special!.getDiscountDescription(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -238,16 +315,43 @@ class _MenuGridSectionState extends State<MenuGridSection> {
                       fontWeight: FontWeight.bold,
                       color: Colors.brown,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    '₱${product.basePrice.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.brown[700],
+                  // Show original price strikethrough and discounted price
+                  if (hasDiscount) ...[
+                    Row(
+                      children: [
+                        Text(
+                          '₱${originalPrice.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '₱${finalPrice.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red[700],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  ] else ...[
+                    Text(
+                      '₱${product.basePrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown[700],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -257,11 +361,12 @@ class _MenuGridSectionState extends State<MenuGridSection> {
     );
   }
 
-  void _showOrderDialog(BuildContext context, ProductModel product) {
+  void _showOrderDialog(BuildContext context, ProductModel product, Map<String, dynamic>? discountInfo) {
     showDialog(
       context: context,
       builder: (context) => OrderDialog(
         product: product,
+        discountInfo: discountInfo,
         onAddToCart: widget.onAddToCart,
       ),
     );

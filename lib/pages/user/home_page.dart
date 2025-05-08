@@ -334,6 +334,30 @@ class _DailySpecialsSectionState extends State<DailySpecialsSection> {
                 ),
             ],
           ),
+          const SizedBox(height: 8),
+          // Help text explaining that specials are automatically applied
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.amber[700], size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Specials are automatically applied when ordering!',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.amber[900],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           _isLoading
               ? const Center(
@@ -392,279 +416,98 @@ class _DailySpecialsSectionState extends State<DailySpecialsSection> {
     // Get associated product if any
     final product = special.productId != null ? _productsMap[special.productId] : null;
     
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => _showSpecialDetails(special, product),
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 70, // Increased height to accommodate discount info
-              decoration: BoxDecoration(
-                color: Colors.brown[300],
-                borderRadius: BorderRadius.circular(2),
+      ),
+      child: InkWell(
+        onTap: product != null 
+          ? () => Navigator.pushNamed(context, '/menu')
+          : null,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.brown[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.local_offer,
+                    color: Colors.amber[800],
+                    size: 24,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    special.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    special.description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  // Show discount details
-                  if (special.discountType != DiscountType.fixedPrice && special.originalPrice > 0)
-                    Row(
-                      children: [
-                        Text(
-                          '₱${special.originalPrice.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: Colors.amber[700],
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                          child: Text(
-                            special.getDiscountDescription(),
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  if (product != null)
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      'See ${product.name} in our menu',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.brown[400],
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Text(
-              '₱${special.price.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.brown[700],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  // Show a dialog with more details about the special
-  void _showSpecialDetails(SpecialModel special, ProductModel? product) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.local_offer, color: Colors.amber[700], size: 24),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                special.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Description
-            Text(
-              special.description,
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Pricing details
-            const Text(
-              'Pricing',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 8),
-            if (special.discountType != DiscountType.fixedPrice) ...[
-              Row(
-                children: [
-                  const Text('Original Price: '),
-                  Text(
-                    '₱${special.originalPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      decoration: TextDecoration.lineThrough,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Text('Discount: '),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      special.getDiscountDescription(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.amber[800],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-            ],
-            Row(
-              children: [
-                const Text('Final Price: '),
-                Text(
-                  '₱${special.price.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.green[700],
-                  ),
-                ),
-              ],
-            ),
-            
-            // Dates
-            const SizedBox(height: 16),
-            const Text(
-              'Valid Period',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.date_range, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  '${_formatDate(special.startDate)} - ${_formatDate(special.endDate)}',
-                ),
-              ],
-            ),
-            
-            // Product details if available
-            if (product != null) ...[
-              const SizedBox(height: 16),
-              const Text(
-                'Product Details',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.coffee, size: 16),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      product.name,
+                      special.name,
                       style: const TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              if (product.description.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  product.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          if (product != null)
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // Navigate to product details/menu page
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${product.name} selected. View in menu to order.'),
-                    duration: const Duration(seconds: 2),
-                    action: SnackBarAction(
-                      label: 'Go to Menu',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/menu');
-                      },
+                    Text(
+                      special.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    if (product != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(
+                          children: [
+                            Icon(Icons.coffee, size: 12, color: Colors.brown[400]),
+                            const SizedBox(width: 4),
+                            Text(
+                              product.name,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.brown[400],
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.arrow_forward, size: 10, color: Colors.brown[400]),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                ),
+                child: Text(
+                  special.getDiscountDescription(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red[700],
                   ),
-                );
-              },
-              child: const Text('View in Menu'),
-            ),
-        ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-  }
-  
-  // Helper method to format date
-  String _formatDate(DateTime date) {
-    return '${date.month}/${date.day}/${date.year}';
   }
 }
