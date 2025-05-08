@@ -1,8 +1,47 @@
 import 'package:flutter/material.dart';
 import '../../widgets/app_drawer.dart';
+import '../../services/special_service.dart';
+import '../../services/promotion_service.dart';
+import '../../models/specialModel.dart';
+import '../../models/promotionModel.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final SpecialService _specialService = SpecialService();
+  final PromotionService _promotionService = PromotionService();
+  
+  List<SpecialModel> _activeSpecials = [];
+  List<PromotionModel> _activePromotions = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final specials = await _specialService.getActiveSpecials();
+      final promotions = await _promotionService.getActivePromotions();
+      
+      setState(() {
+        _activeSpecials = specials;
+        _activePromotions = promotions;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,16 +54,18 @@ class HomePage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       drawer: const AppDrawer(),
-      body: const SingleChildScrollView(
-        child: Column(
-          children: [
-            TitleSection(),
-            FeaturedDrinksSection(),
-            DailySpecialsSection(),
-            PromotionsSection(),
-          ],
-        ),
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Colors.brown))
+          : const SingleChildScrollView(
+              child: Column(
+                children: [
+                  TitleSection(),
+                  FeaturedDrinksSection(),
+                  DynamicDailySpecialsSection(),
+                  DynamicPromotionsSection(),
+                ],
+              ),
+            ),
     );
   }
 }
@@ -220,11 +261,110 @@ class FeaturedDrinksSection extends StatelessWidget {
   }
 }
 
-class DailySpecialsSection extends StatelessWidget {
-  const DailySpecialsSection({super.key});
+class DynamicDailySpecialsSection extends StatefulWidget {
+  const DynamicDailySpecialsSection({super.key});
+
+  @override
+  State<DynamicDailySpecialsSection> createState() => _DynamicDailySpecialsSectionState();
+}
+
+class _DynamicDailySpecialsSectionState extends State<DynamicDailySpecialsSection> {
+  final SpecialService _specialService = SpecialService();
+  List<SpecialModel> _specials = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSpecials();
+  }
+
+  Future<void> _loadSpecials() async {
+    try {
+      final specials = await _specialService.getActiveSpecials();
+      setState(() {
+        _specials = specials;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.brown.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(color: Colors.brown),
+        ),
+      );
+    }
+
+    if (_specials.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.brown.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.local_offer, color: Colors.brown[700]),
+                const SizedBox(width: 8),
+                const Text(
+                  'Daily Specials',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'No specials available today',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -258,9 +398,11 @@ class DailySpecialsSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _buildSpecialItem('Caramel Macchiato', '₱4.99', 'Limited time offer!'),
-          _buildSpecialItem('Fresh Baked Croissants', '₱3.50', 'Made in-house'),
-          _buildSpecialItem('Iced Coffee Special', '₱3.99', 'Perfect for summer'),
+          ..._specials.map((special) => _buildSpecialItem(
+                special.name,
+                '₱${special.price.toStringAsFixed(2)}',
+                special.description,
+              )),
         ],
       ),
     );
@@ -315,11 +457,110 @@ class DailySpecialsSection extends StatelessWidget {
   }
 }
 
-class PromotionsSection extends StatelessWidget {
-  const PromotionsSection({super.key});
+class DynamicPromotionsSection extends StatefulWidget {
+  const DynamicPromotionsSection({super.key});
+
+  @override
+  State<DynamicPromotionsSection> createState() => _DynamicPromotionsSectionState();
+}
+
+class _DynamicPromotionsSectionState extends State<DynamicPromotionsSection> {
+  final PromotionService _promotionService = PromotionService();
+  List<PromotionModel> _promotions = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPromotions();
+  }
+
+  Future<void> _loadPromotions() async {
+    try {
+      final promotions = await _promotionService.getActivePromotions();
+      setState(() {
+        _promotions = promotions;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.brown[700],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.brown.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
+    if (_promotions.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.brown[700],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.brown.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.campaign, color: Colors.amber[300]),
+                const SizedBox(width: 8),
+                const Text(
+                  'Current Promotions',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'No promotions available right now',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.brown[100],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -353,16 +594,11 @@ class PromotionsSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _buildPromotionItem(
-            'Happy Hour',
-            '2 PM - 5 PM',
-            '20% off all drinks',
-          ),
-          _buildPromotionItem(
-            'Weekend Special',
-            'All Day',
-            'Free pastry with any coffee purchase',
-          ),
+          ..._promotions.map((promotion) => _buildPromotionItem(
+                promotion.title,
+                promotion.time,
+                promotion.description,
+              )),
         ],
       ),
     );
