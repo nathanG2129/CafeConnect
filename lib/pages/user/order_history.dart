@@ -338,7 +338,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Subtotal:',
+                  'Subtotal: ₱${order.subtotal.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 14, color: Colors.brown[700]),
                 ),
                 Text(
@@ -356,7 +356,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Tax:',
+                  'Tax: ₱${order.tax.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 14, color: Colors.brown[700]),
                 ),
                 Text(
@@ -381,7 +381,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                   ),
                 ),
                 Text(
-                  '\$${order.totalAmount.toStringAsFixed(2)}',
+                  '₱${order.totalAmount.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -487,9 +487,9 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 ),
               ),
               Text(
-                '\$${item.totalPrice.toStringAsFixed(2)}',
+                '₱${item.totalPrice.toStringAsFixed(2)}',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.brown[700],
                 ),

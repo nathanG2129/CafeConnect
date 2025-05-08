@@ -287,7 +287,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                       const SizedBox(height: 12),
                       _buildStatCard(
                         title: "Today's Sales",
-                        value: "\$${_todaySales.toStringAsFixed(2)}",
+                        value: "₱${_todaySales.toStringAsFixed(2)}",
                         icon: Icons.attach_money,
                         color: Colors.green[600]!,
                       ),
@@ -332,7 +332,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                         Expanded(
                           child: _buildStatCard(
                             title: "Today's Sales",
-                            value: "\$${_todaySales.toStringAsFixed(2)}",
+                            value: "₱${_todaySales.toStringAsFixed(2)}",
                             icon: Icons.attach_money,
                             color: Colors.green[600]!,
                           ),

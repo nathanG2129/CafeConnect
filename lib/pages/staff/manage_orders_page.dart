@@ -311,7 +311,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '$totalItems ${totalItems == 1 ? 'item' : 'items'} • \$${order.totalAmount.toStringAsFixed(2)}',
+                              '$totalItems ${totalItems == 1 ? 'item' : 'items'} • ₱${order.totalAmount.toStringAsFixed(2)}',
                               style: TextStyle(
                                 color: Colors.brown[600],
                                 fontWeight: FontWeight.w500,
@@ -377,7 +377,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'Subtotal: \$${order.subtotal.toStringAsFixed(2)}',
+                          'Subtotal: ₱${order.subtotal.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.brown[700],
@@ -385,7 +385,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Tax: \$${order.tax.toStringAsFixed(2)}',
+                          'Tax: ₱${order.tax.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.brown[700],
@@ -393,7 +393,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Total: \$${order.totalAmount.toStringAsFixed(2)}',
+                          'Total: ₱${order.totalAmount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -488,7 +488,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                 ),
               ),
               Text(
-                '\$${item.totalPrice.toStringAsFixed(2)}',
+                '₱${item.totalPrice.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

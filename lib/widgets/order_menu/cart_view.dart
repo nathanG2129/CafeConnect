@@ -216,14 +216,14 @@ class _CartViewState extends State<CartView> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '\$${(item.totalPrice / item.quantity).toStringAsFixed(2)} each',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            '₱${(item.totalPrice / item.quantity).toStringAsFixed(2)} each',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
                             ),
                           ),
                           Text(
-                            '\$${item.totalPrice.toStringAsFixed(2)}',
+                            '₱${item.totalPrice.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -310,7 +310,7 @@ class _CartViewState extends State<CartView> {
                 style: TextStyle(fontSize: 16),
               ),
               Text(
-                '\$${widget.cart.totalPrice.toStringAsFixed(2)}',
+                '₱${widget.cart.totalPrice.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -327,7 +327,7 @@ class _CartViewState extends State<CartView> {
                 style: TextStyle(fontSize: 16),
               ),
               Text(
-                '\$${(widget.cart.totalPrice * 0.08).toStringAsFixed(2)}',
+                '₱${(widget.cart.totalPrice * 0.08).toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -347,11 +347,11 @@ class _CartViewState extends State<CartView> {
                 ),
               ),
               Text(
-                '\$${(widget.cart.totalPrice * 1.08).toStringAsFixed(2)}',
+                '₱${(widget.cart.totalPrice * 1.08).toStringAsFixed(2)}',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.brown[700],
+                  color: Colors.brown[800],
                 ),
               ),
             ],

@@ -90,37 +90,37 @@ class FeaturedDrinksSection extends StatelessWidget {
     {
       'name': 'Caramel Macchiato',
       'image': 'assets/coffees/macchiato.jpg',
-      'price': '\$4.99',
+      'price': '₱4.99',
     },
     {
       'name': 'Mocha',
       'image': 'assets/coffees/mocha.jpg',
-      'price': '\$4.49',
+      'price': '₱4.49',
     },
     {
       'name': 'Cold Brew',
       'image': 'assets/coffees/coldbrew.jpg',
-      'price': '\$3.99',
+      'price': '₱3.99',
     },
     {
       'name': 'Americano',
       'image': 'assets/coffees/americano.jpg',
-      'price': '\$3.49',
+      'price': '₱3.49',
     },
     {
       'name': 'Latte',
       'image': 'assets/coffees/latte.jpg',
-      'price': '\$4.29',
+      'price': '₱4.29',
     },
     {
       'name': 'Cappuccino',
       'image': 'assets/coffees/capuccino.jpg',
-      'price': '\$4.49',
+      'price': '₱4.49',
     },
     {
       'name': 'Espresso',
       'image': 'assets/coffees/expresso.jpg',
-      'price': '\$2.99',
+      'price': '₱2.99',
     },
   ];
 
@@ -258,9 +258,9 @@ class DailySpecialsSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _buildSpecialItem('Caramel Macchiato', '\$4.99', 'Limited time offer!'),
-          _buildSpecialItem('Fresh Baked Croissants', '\$3.50', 'Made in-house'),
-          _buildSpecialItem('Iced Coffee Special', '\$3.99', 'Perfect for summer'),
+          _buildSpecialItem('Caramel Macchiato', '₱4.99', 'Limited time offer!'),
+          _buildSpecialItem('Fresh Baked Croissants', '₱3.50', 'Made in-house'),
+          _buildSpecialItem('Iced Coffee Special', '₱3.99', 'Perfect for summer'),
         ],
       ),
     );

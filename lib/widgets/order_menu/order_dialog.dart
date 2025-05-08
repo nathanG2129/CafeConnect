@@ -170,11 +170,15 @@ class _OrderDialogState extends State<OrderDialog> {
                           ),
                         ),
                       ),
-                      Text(
-                        'Base: \$${widget.product.basePrice.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.brown[700],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                          'Base: ₱${widget.product.basePrice.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.brown[700],
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -254,7 +258,7 @@ class _OrderDialogState extends State<OrderDialog> {
                       final price = size['price'] as double;
                       return DropdownMenuItem<String>(
                         value: name,
-                        child: Text('$name ${price > 0 ? "(+\$${price.toStringAsFixed(2)})" : ""}'),
+                        child: Text('$name ${price > 0 ? "(+₱${price.toStringAsFixed(2)})" : ""}'),
                       );
                     }).toList(),
                     onChanged: (String? value) {
@@ -279,7 +283,7 @@ class _OrderDialogState extends State<OrderDialog> {
                       final price = addOn['price'] as double;
                       return DropdownMenuItem<String>(
                         value: name,
-                        child: Text('$name (+\$${price.toStringAsFixed(2)})'),
+                        child: Text('$name (+₱${price.toStringAsFixed(2)})'),
                       );
                     }).toList(),
                     onChanged: (String? value) {
@@ -310,7 +314,7 @@ class _OrderDialogState extends State<OrderDialog> {
                           ),
                         ),
                         Text(
-                          '\$${totalPrice.toStringAsFixed(2)}',
+                          '₱${totalPrice.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
