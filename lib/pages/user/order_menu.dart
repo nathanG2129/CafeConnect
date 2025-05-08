@@ -49,6 +49,10 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isDesktop = screenWidth >= 1100;
+    final bool isTablet = screenWidth >= 768 && screenWidth < 1100;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF5E6D3),
       appBar: AppBar(
@@ -56,6 +60,7 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
         centerTitle: true,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
+        elevation: 2,
         actions: [
           Stack(
             alignment: Alignment.center,
@@ -63,6 +68,7 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
               IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: _toggleCart,
+                tooltip: 'View Cart',
               ),
               if (_cart.itemCount > 0)
                 Positioned(
@@ -91,16 +97,27 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
                 ),
             ],
           ),
+          const SizedBox(width: 8),
         ],
       ),
       drawer: const AppDrawer(),
-      body: _isCartOpen
-          ? CartView(
-              cart: _cart,
-              onClose: _toggleCart,
-              onUpdate: () => setState(() {}),
-            )
-          : SingleChildScrollView(
+      body: isDesktop
+          ? _buildDesktopLayout()
+          : isTablet
+              ? _buildTabletLayout()
+              : _buildMobileLayout(),
+    );
+  }
+  
+  Widget _buildDesktopLayout() {
+    return Row(
+      children: [
+        // Menu section (2/3 of screen)
+        Expanded(
+          flex: 2,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
                   const HeaderSection(),
@@ -114,6 +131,100 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
                 ],
               ),
             ),
+          ),
+        ),
+        // Cart section (1/3 of screen)
+        Expanded(
+          flex: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.brown.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: const Offset(-2, 0),
+                ),
+              ],
+            ),
+            child: CartView(
+              cart: _cart,
+              onClose: () {}, // No-op since cart is always visible on desktop
+              onUpdate: () => setState(() {}),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildTabletLayout() {
+    if (_isCartOpen) {
+      return CartView(
+        cart: _cart,
+        onClose: _toggleCart,
+        onUpdate: () => setState(() {}),
+      );
+    }
+    
+    return SafeArea(
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverToBoxAdapter(
+              child: const HeaderSection(),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: MenuGridSection(
+                onAddToCart: (OrderItemModel orderItem) {
+                  setState(() {
+                    _cart.addItem(orderItem);
+                    
+                    // Automatically show cart when adding first item (optional)
+                    if (_cart.itemCount == 1) {
+                      _isCartOpen = true;
+                    }
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildMobileLayout() {
+    if (_isCartOpen) {
+      return CartView(
+        cart: _cart,
+        onClose: _toggleCart,
+        onUpdate: () => setState(() {}),
+      );
+    }
+    
+    return SafeArea(
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: const HeaderSection(),
+          ),
+          SliverToBoxAdapter(
+            child: MenuGridSection(
+              onAddToCart: (OrderItemModel orderItem) {
+                setState(() {
+                  _cart.addItem(orderItem);
+                });
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

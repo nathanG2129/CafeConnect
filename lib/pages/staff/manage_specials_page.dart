@@ -227,7 +227,6 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
                     special.startDate.isBefore(now) && 
                     special.endDate.isAfter(now);
     final isUpcoming = special.isActive && special.startDate.isAfter(now);
-    final isExpired = !special.isActive || special.endDate.isBefore(now);
     
     Color statusColor;
     String statusText;
