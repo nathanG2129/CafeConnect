@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:flutter_activity1/models/orderItemModel.dart';
 import 'package:flutter_activity1/models/orderModel.dart';
 import 'package:get_storage/get_storage.dart';
+import 'dart:math';
 
 class CartModel {
-  List<OrderModel> items = [];
+  List<OrderItemModel> items = [];
   
   // Get total price of all items in cart
   double get totalPrice {
@@ -16,7 +18,7 @@ class CartModel {
   }
   
   // Add item to cart
-  void addItem(OrderModel item) {
+  void addItem(OrderItemModel item) {
     // Check if the item already exists with the same coffee, size, and add-on
     int existingIndex = items.indexWhere((element) => 
       element.coffeeName == item.coffeeName && 
@@ -26,7 +28,7 @@ class CartModel {
     
     if (existingIndex != -1) {
       // Update the existing item quantity
-      OrderModel existingItem = items[existingIndex];
+      OrderItemModel existingItem = items[existingIndex];
       int newQuantity = existingItem.quantity + item.quantity;
       double newTotalPrice = existingItem.basePrice * newQuantity;
       
@@ -41,6 +43,23 @@ class CartModel {
     
     // Save to local storage
     _saveToStorage();
+  }
+  
+  // Add item from legacy OrderModel (for backward compatibility)
+  void addItemFromLegacyOrder(OrderModel legacyOrder) {
+    // Convert old OrderModel to new OrderItemModel
+    OrderItemModel item = OrderItemModel(
+      id: legacyOrder.id,
+      coffeeName: legacyOrder.coffeeName ?? '',
+      size: legacyOrder.size ?? '',
+      addOn: legacyOrder.addOn,
+      quantity: legacyOrder.quantity ?? 1,
+      basePrice: legacyOrder.basePrice ?? 0.0,
+      totalPrice: legacyOrder.totalPrice ?? 0.0,
+      imagePath: legacyOrder.imagePath ?? '',
+    );
+    
+    addItem(item);
   }
   
   // Remove item from cart
@@ -58,7 +77,7 @@ class CartModel {
     
     int index = items.indexWhere((item) => item.id == itemId);
     if (index != -1) {
-      OrderModel item = items[index];
+      OrderItemModel item = items[index];
       double newTotalPrice = item.basePrice * newQuantity;
       
       items[index] = item.copyWith(
@@ -76,6 +95,19 @@ class CartModel {
     _saveToStorage();
   }
   
+  // Create a single order from all cart items
+  OrderModel createOrder() {
+    // Generate a unique order ID
+    final String orderId = 'order_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}';
+    
+    // Use the new factory constructor to create a multi-item order
+    return OrderModel.fromCartItems(
+      id: orderId,
+      items: List.from(items), // Create a copy of the items list
+      userId: '', // Will be set by OrderService
+    );
+  }
+  
   // Save cart items to local storage
   void _saveToStorage() {
     final storage = GetStorage();
@@ -90,7 +122,7 @@ class CartModel {
     
     if (cartData != null) {
       final List<dynamic> decoded = jsonDecode(cartData);
-      items = decoded.map((item) => OrderModel.fromMap(item)).toList();
+      items = decoded.map((item) => OrderItemModel.fromMap(item)).toList();
     }
   }
 } 

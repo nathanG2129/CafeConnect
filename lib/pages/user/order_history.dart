@@ -4,6 +4,7 @@ import 'package:flutter_activity1/services/order_service.dart';
 import 'package:flutter_activity1/models/cartModel.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/app_drawer.dart';
+import 'package:flutter_activity1/models/orderItemModel.dart';
 
 class OrderHistoryPage extends StatefulWidget {
   const OrderHistoryPage({super.key});
@@ -263,6 +264,11 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     bool canCancel = order.status.toLowerCase() == 'pending' || 
                     order.status.toLowerCase() == 'preparing';
     
+    // Get a representative image for the order
+    String mainImagePath = order.items.isNotEmpty 
+        ? order.items.first.imagePath 
+        : 'assets/coffees/default.jpg';
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
@@ -274,44 +280,15 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Order header with time and status
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    order.imagePath,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.coffeeName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Size: ${order.size}',
-                        style: TextStyle(fontSize: 14, color: Colors.brown[600]),
-                      ),
-                      if (order.addOn != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          'Add-on: ${order.addOn}',
-                          style: TextStyle(fontSize: 14, color: Colors.brown[600]),
-                        ),
-                      ],
-                    ],
+                Text(
+                  'Order #${order.id.substring(order.id.length - 5)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
                 Text(
@@ -324,6 +301,8 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               ],
             ),
             const SizedBox(height: 12),
+            
+            // Status indicator
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -350,35 +329,79 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+            
+            // List of items in this order
+            ...order.items.map((item) => _buildOrderItemTile(item)).toList(),
+            
             const Divider(height: 24),
+            
+            // Order summary
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Quantity: ${order.quantity}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  'Subtotal:',
+                  style: TextStyle(fontSize: 14, color: Colors.brown[700]),
                 ),
                 Text(
-                  '\$${order.totalPrice.toStringAsFixed(2)}',
+                  '\$${order.subtotal.toStringAsFixed(2)}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.brown[700],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Tax:',
+                  style: TextStyle(fontSize: 14, color: Colors.brown[700]),
+                ),
+                Text(
+                  '\$${order.tax.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown[700],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Total:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '\$${order.totalAmount.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown[700],
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _reorderItem(order),
+                    onPressed: () => _reorderAllItems(order),
                     icon: const Icon(Icons.replay),
-                    label: const Text('Reorder'),
+                    label: const Text('Reorder All'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.brown[700],
                       side: BorderSide(color: Colors.brown[700]!),
@@ -413,11 +436,83 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     );
   }
 
-  void _reorderItem(OrderModel order) {
-    // Add item to cart before navigating
+  // Helper method to build a single order item tile
+  Widget _buildOrderItemTile(OrderItemModel item) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Item image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              item.imagePath,
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Item details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.coffeeName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  'Size: ${item.size}${item.addOn != null ? ' • ${item.addOn}' : ''}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.brown[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Item quantity and price
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${item.quantity}x',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.brown[700],
+                ),
+              ),
+              Text(
+                '\$${item.totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[700],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _reorderAllItems(OrderModel order) {
+    // Add all items to cart before navigating
     final cartModel = CartModel();
     cartModel.loadFromStorage();
-    cartModel.addItem(order);
+    
+    // Add each item in the order to the cart
+    for (var item in order.items) {
+      cartModel.addItem(item);
+    }
     
     // Navigate to menu page with a flag to open the cart
     Navigator.pushReplacementNamed(
@@ -428,7 +523,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${order.coffeeName} added to cart'),
+        content: Text('Order added to cart'),
         backgroundColor: Colors.green[600],
       ),
     );
@@ -445,7 +540,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Are you sure you want to cancel your order for ${order.coffeeName}?'),
+                Text('Are you sure you want to cancel your order?'),
                 const SizedBox(height: 8),
                 Text(
                   'This action cannot be undone.',
@@ -500,7 +595,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Your order for ${order.coffeeName} has been cancelled'),
+            content: const Text('Your order has been cancelled'),
             backgroundColor: Colors.green[600],
           ),
         );

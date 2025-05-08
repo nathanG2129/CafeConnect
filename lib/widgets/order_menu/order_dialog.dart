@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_activity1/models/orderModel.dart';
-import 'package:flutter_activity1/models/product_model.dart';
+import 'package:flutter_activity1/models/orderItemModel.dart';
+import 'package:flutter_activity1/models/productModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 
 class OrderDialog extends StatefulWidget {
   final ProductModel product;
-  final Function(OrderModel) onAddToCart;
+  final Function(OrderItemModel) onAddToCart;
 
   const OrderDialog({
     super.key,
@@ -58,15 +58,12 @@ class _OrderDialogState extends State<OrderDialog> {
       return;
     }
 
-    // Generate a unique order ID
-    final String orderId = 'order_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}';
-    
-    // Get current user ID or default to empty string
-    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    // Generate a unique item ID
+    final String itemId = 'item_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}';
 
-    // Create an OrderModel
-    final OrderModel order = OrderModel(
-      id: orderId,
+    // Create an OrderItemModel
+    final OrderItemModel orderItem = OrderItemModel(
+      id: itemId,
       coffeeName: widget.product.name,
       size: selectedSize!,
       addOn: selectedAddOn,
@@ -74,12 +71,10 @@ class _OrderDialogState extends State<OrderDialog> {
       basePrice: widget.product.basePrice,
       totalPrice: totalPrice,
       imagePath: widget.product.imagePath,
-      orderDate: DateTime.now(),
-      userId: userId, // Use the current user's ID
     );
 
     // Add to cart
-    widget.onAddToCart(order);
+    widget.onAddToCart(orderItem);
 
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(

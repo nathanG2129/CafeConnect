@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_activity1/models/product_model.dart';
+import 'package:flutter_activity1/models/productModel.dart';
 import 'package:flutter_activity1/services/product_service.dart';
 
 class EditProductPage extends StatefulWidget {

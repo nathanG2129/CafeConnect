@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/orderModel.dart';
+import '../../models/orderItemModel.dart';
 import '../../services/order_service.dart';
 import '../../widgets/app_drawer.dart';
+
 
 class ManageOrdersPage extends StatefulWidget {
   static const String routeName = '/manage-orders';
@@ -249,6 +251,14 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
         break;
     }
     
+    // Get a representative image for the order
+    String mainImagePath = order.items.isNotEmpty 
+        ? order.items.first.imagePath 
+        : 'assets/coffees/default.jpg';
+    
+    // Get total number of items
+    int totalItems = order.items.fold(0, (sum, item) => sum + item.quantity);
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 3,
@@ -260,64 +270,59 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Order header - Order ID, date, and status
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Order image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    order.imagePath,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Order details
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        order.coffeeName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown,
+                      // Representative order image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          mainImagePath,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Size: ${order.size}${order.addOn != null ? ' • Add-on: ${order.addOn}' : ''}',
-                        style: TextStyle(
-                          color: Colors.brown[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Quantity: ${order.quantity} • \$${order.totalPrice.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          color: Colors.brown[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Ordered: ${DateFormat('MMM dd, yyyy • h:mm a').format(order.orderDate)}',
-                        style: TextStyle(
-                          color: Colors.brown[400],
-                          fontSize: 12,
+                      const SizedBox(width: 12),
+                      // Order ID and date
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Order #${order.id.substring(order.id.length - 5)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.brown,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Ordered: ${DateFormat('MMM dd, yyyy • h:mm a').format(order.orderDate)}',
+                              style: TextStyle(
+                                color: Colors.brown[400],
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '$totalItems ${totalItems == 1 ? 'item' : 'items'} • \$${order.totalAmount.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: Colors.brown[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
                 // Status indicator
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -345,26 +350,154 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                     ],
                   ),
                 ),
-                const Spacer(),
-                // Action button
-                if (nextStatus != null)
-                  ElevatedButton.icon(
+              ],
+            ),
+
+            // Divider between header and items
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Divider(color: Colors.brown[200]),
+            ),
+
+            // List of order items
+            ...order.items.map((item) => _buildOrderItemTile(item)).toList(),
+
+            // Order summary
+            if (order.items.length > 1) ... [
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Divider(color: Colors.brown[200]),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Subtotal: \$${order.subtotal.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.brown[700],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tax: \$${order.tax.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.brown[700],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Total: \$${order.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Action button
+            if (nextStatus != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
                     onPressed: () => _updateOrderStatus(order.id, nextStatus!),
                     icon: Icon(nextStatusIcon, size: 18),
                     label: Text(nextStatusText),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown[700],
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
-              ],
-            ),
+                ),
+              ),
           ],
         ),
+      ),
+    );
+  }
+  
+  // Helper method to display each order item
+  Widget _buildOrderItemTile(OrderItemModel item) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Item image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset(
+              item.imagePath,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Item details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.coffeeName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  'Size: ${item.size}${item.addOn != null ? ' • ${item.addOn}' : ''}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.brown[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Item quantity and price
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${item.quantity}x',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.brown[700],
+                ),
+              ),
+              Text(
+                '\$${item.totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[700],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

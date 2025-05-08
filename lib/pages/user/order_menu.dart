@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/app_drawer.dart';
 import 'package:flutter_activity1/models/cartModel.dart';
-import 'package:flutter_activity1/models/orderModel.dart';
+import 'package:flutter_activity1/models/orderItemModel.dart';
 import 'package:flutter_activity1/widgets/order_menu/header_section.dart';
 import 'package:flutter_activity1/widgets/order_menu/menu_grid_section.dart';
 import 'package:flutter_activity1/widgets/order_menu/cart_view.dart';
@@ -105,9 +105,9 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
                 children: [
                   const HeaderSection(),
                   MenuGridSection(
-                    onAddToCart: (OrderModel order) {
+                    onAddToCart: (OrderItemModel orderItem) {
                       setState(() {
-                        _cart.addItem(order);
+                        _cart.addItem(orderItem);
                       });
                     },
                   ),

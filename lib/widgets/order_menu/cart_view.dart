@@ -465,27 +465,21 @@ class _CartViewState extends State<CartView> {
     });
 
     try {
-      // Save each order item to Firestore
-      bool allSuccessful = true;
+      // Create a single order with all items in cart
+      final order = widget.cart.createOrder();
       
-      for (var item in widget.cart.items) {
-        // Ensure all items have the current user's ID
-        final updatedItem = item.userId.isEmpty 
-            ? item.copyWith(userId: currentUser.uid)
-            : item;
-        
-        bool success = await _orderService.saveOrder(updatedItem);
-        if (!success) {
-          allSuccessful = false;
-        }
-      }
+      // Make sure the order has the current user's ID
+      final updatedOrder = order.copyWith(userId: currentUser.uid);
+      
+      // Save the order to Firestore
+      bool success = await _orderService.saveOrder(updatedOrder);
 
       if (!mounted) return;
       setState(() {
         _isProcessing = false;
       });
 
-      if (allSuccessful) {
+      if (success) {
         widget.cart.clearCart();
         widget.onUpdate();
         

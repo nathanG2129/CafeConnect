@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_activity1/models/orderModel.dart';
-import 'package:flutter_activity1/models/product_model.dart';
+import 'package:flutter_activity1/models/orderItemModel.dart';
+import 'package:flutter_activity1/models/productModel.dart';
 import 'package:flutter_activity1/services/product_service.dart';
 import 'package:flutter_activity1/widgets/order_menu/order_dialog.dart';
 
 class MenuGridSection extends StatefulWidget {
-  final Function(OrderModel) onAddToCart;
+  final Function(OrderItemModel) onAddToCart;
 
   const MenuGridSection({
     super.key,
