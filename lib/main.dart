@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'pages/home_page.dart';
-import 'pages/login_page.dart';
-import 'pages/registration_page.dart';
-import 'pages/profile_page.dart';
-import 'pages/order_menu.dart';
-import 'pages/order_history.dart';
-import 'pages/coffee_guide.dart';
-import 'pages/about_page.dart';
+import 'pages/user/home_page.dart';
+import 'pages/auth/login_page.dart';
+import 'pages/auth/registration_page.dart';
+import 'pages/user/profile_page.dart';
+import 'pages/user/order_menu.dart';
+import 'pages/user/order_history.dart';
+import 'pages/user/coffee_guide.dart';
+import 'pages/user/about_page.dart';
 import 'pages/staff/staff_dashboard.dart';
 import 'package:get_storage/get_storage.dart';
 

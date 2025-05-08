@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_activity1/models/userModel.dart';
 // import '../models/userModel.dart';
-import '../widgets/app_drawer.dart';
-import '../services/auth_service.dart';
-import 'home_page.dart';
+import '../../widgets/app_drawer.dart';
+import '../../services/auth_service.dart';
+import '../user/home_page.dart';
 
 class RegistrationPage extends StatelessWidget {
   static const String routeName = '/register';
