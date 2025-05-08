@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_activity1/pages/staff/manage_products_page.dart';
 import 'package:flutter_activity1/pages/staff/staff_dashboard.dart';
 import 'package:flutter_activity1/pages/staff/manage_orders_page.dart';
+import 'package:flutter_activity1/pages/staff/manage_specials_page.dart';
 import 'package:flutter_activity1/pages/admin/update_pricing_page.dart';
 import 'package:flutter_activity1/pages/user/home_page.dart';
 import 'package:flutter_activity1/pages/auth/login_page.dart';
@@ -28,5 +29,6 @@ Map<String, WidgetBuilder> appRoutes = {
   '/staff-dashboard': (context) => const StaffDashboardPage(),
   '/manage-products': (context) => const ManageProductsPage(),
   '/manage-orders': (context) => const ManageOrdersPage(),
+  '/manage-specials': (context) => const ManageSpecialsPage(),
   '/update-pricing': (context) => const UpdatePricingPage(),
 }; 
