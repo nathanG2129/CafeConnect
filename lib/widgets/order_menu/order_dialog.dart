@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_activity1/models/orderItemModel.dart';
 import 'package:flutter_activity1/models/productModel.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 
 class OrderDialog extends StatefulWidget {
