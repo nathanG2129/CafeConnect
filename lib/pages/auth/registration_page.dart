@@ -501,6 +501,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         });
                         
                         if (result != null) {
+                          // Clear the app drawer cache to reflect the new logged-in state
+                          AppDrawerState.clearCache();
+                          
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => const HomePage()),

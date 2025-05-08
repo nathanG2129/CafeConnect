@@ -313,6 +313,9 @@ class _LoginFormState extends State<LoginForm> {
         if (result != null) {
           // Login successful, navigate based on user role
           if (mounted) {
+            // Clear the drawer cache to ensure it updates with the new login state
+            AppDrawerState.clearCache();
+            
             // Get the appropriate route based on user role
             String route = await _authService.getAppropriateRoute();
             
