@@ -16,6 +16,12 @@ class LoginPage extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        ),
       ),
       drawer: const AppDrawer(),
       body: const SingleChildScrollView(
