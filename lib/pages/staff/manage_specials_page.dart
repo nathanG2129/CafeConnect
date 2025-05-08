@@ -291,9 +291,23 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
     final TextEditingController priceController = TextEditingController(text: isEditing ? special.price.toString() : '');
     
     String? selectedProductId = isEditing ? special.relatedProductId : null;
+    ProductModel? selectedProduct;
+    if (selectedProductId != null && selectedProductId.isNotEmpty) {
+      selectedProduct = _products.firstWhere(
+        (product) => product.id == selectedProductId,
+        orElse: () => ProductModel.empty(),
+      );
+    }
+    
     DateTime startDate = isEditing ? special.startDate : DateTime.now();
     DateTime? endDate = isEditing ? special.endDate : null;
     bool isActive = isEditing ? special.isActive : true;
+    
+    // Discount options
+    bool useDiscount = false;
+    double discountPercent = 10.0; // Default 10% discount
+    double discountAmount = 0.0;
+    String discountType = 'percent'; // 'percent' or 'amount'
 
     return showDialog<void>(
       context: context,
@@ -301,6 +315,62 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            
+            // Function to handle product selection and price calculation
+            void handleProductSelection(String? productId) {
+              setState(() {
+                selectedProductId = productId;
+                
+                // Find the selected product
+                if (productId != null && productId.isNotEmpty) {
+                  selectedProduct = _products.firstWhere(
+                    (product) => product.id == productId,
+                    orElse: () => ProductModel.empty(),
+                  );
+                  
+                  // Update name and description if empty
+                  if (nameController.text.isEmpty) {
+                    nameController.text = "${selectedProduct!.name} Special";
+                  }
+                  
+                  if (descriptionController.text.isEmpty) {
+                    descriptionController.text = "Special offer on ${selectedProduct!.name}";
+                  }
+                  
+                  // Calculate price with discount if enabled
+                  if (useDiscount && selectedProduct != null) {
+                    if (discountType == 'percent') {
+                      final discountValue = selectedProduct!.basePrice * (discountPercent / 100);
+                      priceController.text = (selectedProduct!.basePrice - discountValue).toStringAsFixed(2);
+                    } else {
+                      priceController.text = (selectedProduct!.basePrice - discountAmount).toStringAsFixed(2);
+                    }
+                  } else {
+                    // Just set the same price
+                    priceController.text = selectedProduct!.basePrice.toString();
+                  }
+                } else {
+                  selectedProduct = null;
+                }
+              });
+            }
+            
+            // Function to recalculate price when discount changes
+            void recalculatePrice() {
+              if (selectedProduct != null) {
+                if (useDiscount) {
+                  if (discountType == 'percent') {
+                    final discountValue = selectedProduct!.basePrice * (discountPercent / 100);
+                    priceController.text = (selectedProduct!.basePrice - discountValue).toStringAsFixed(2);
+                  } else {
+                    priceController.text = (selectedProduct!.basePrice - discountAmount).toStringAsFixed(2);
+                  }
+                } else {
+                  priceController.text = selectedProduct!.basePrice.toString();
+                }
+              }
+            }
+            
             return AlertDialog(
               title: Text('${isEditing ? 'Edit' : 'Add'} Special'),
               content: SingleChildScrollView(
@@ -323,16 +393,6 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
                       maxLines: 2,
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: priceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Price',
-                        hintText: 'Enter price',
-                        prefixText: '₱',
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 16),
                     DropdownButtonFormField<String?>(
                       decoration: const InputDecoration(
                         labelText: 'Based on Product (Optional)',
@@ -348,17 +408,140 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
                         ..._products.map((product) {
                           return DropdownMenuItem<String?>(
                             value: product.id,
-                            child: Text(product.name),
+                            child: Text('${product.name} - ₱${product.basePrice}'),
                           );
                         }).toList(),
                       ],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedProductId = value;
-                        });
-                      },
+                      onChanged: handleProductSelection,
                     ),
                     const SizedBox(height: 16),
+                    
+                    // Show discount options only if a product is selected
+                    if (selectedProduct != null && selectedProduct!.id.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: useDiscount,
+                                onChanged: (value) {
+                                  setState(() {
+                                    useDiscount = value ?? false;
+                                    recalculatePrice();
+                                  });
+                                },
+                              ),
+                              const Text('Apply discount'),
+                            ],
+                          ),
+                          
+                          if (useDiscount)
+                            Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Radio<String>(
+                                      value: 'percent',
+                                      groupValue: discountType,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          discountType = value!;
+                                          recalculatePrice();
+                                        });
+                                      },
+                                    ),
+                                    const Text('Percentage discount'),
+                                    const Spacer(),
+                                    SizedBox(
+                                      width: 80,
+                                      child: TextField(
+                                        decoration: const InputDecoration(
+                                          isDense: true,
+                                          suffixText: '%',
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        enabled: discountType == 'percent',
+                                        onChanged: (value) {
+                                          setState(() {
+                                            discountPercent = double.tryParse(value) ?? 10.0;
+                                            recalculatePrice();
+                                          });
+                                        },
+                                        controller: TextEditingController(text: discountPercent.toString()),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Radio<String>(
+                                      value: 'amount',
+                                      groupValue: discountType,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          discountType = value!;
+                                          recalculatePrice();
+                                        });
+                                      },
+                                    ),
+                                    const Text('Amount discount'),
+                                    const Spacer(),
+                                    SizedBox(
+                                      width: 80,
+                                      child: TextField(
+                                        decoration: const InputDecoration(
+                                          isDense: true,
+                                          prefixText: '₱',
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        enabled: discountType == 'amount',
+                                        onChanged: (value) {
+                                          setState(() {
+                                            discountAmount = double.tryParse(value) ?? 0.0;
+                                            recalculatePrice();
+                                          });
+                                        },
+                                        controller: TextEditingController(text: discountAmount.toString()),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                // Show the original price and calculated price
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Original price: ₱${selectedProduct!.basePrice}',
+                                        style: const TextStyle(fontStyle: FontStyle.italic),
+                                      ),
+                                      if (useDiscount) 
+                                        Text(
+                                          'Discount: ${discountType == 'percent' ? '$discountPercent%' : '₱$discountAmount'}',
+                                          style: const TextStyle(color: Colors.green),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    
+                    TextField(
+                      controller: priceController,
+                      decoration: const InputDecoration(
+                        labelText: 'Price',
+                        hintText: 'Enter price',
+                        prefixText: '₱',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    
                     Row(
                       children: [
                         const Text('Start Date: '),
@@ -431,6 +614,30 @@ class _ManageSpecialsPageState extends State<ManageSpecialsPage> {
                         ),
                       ],
                     ),
+                    
+                    // Product availability warning
+                    if (selectedProduct != null && !selectedProduct!.isAvailable)
+                      Container(
+                        margin: const EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.red.withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.warning, color: Colors.red[700], size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Warning: The selected product is currently unavailable.',
+                                style: TextStyle(color: Colors.red[700], fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),

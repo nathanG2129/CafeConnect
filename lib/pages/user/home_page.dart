@@ -4,6 +4,8 @@ import '../../services/special_service.dart';
 import '../../services/promotion_service.dart';
 import '../../models/specialModel.dart';
 import '../../models/promotionModel.dart';
+import '../../models/productModel.dart';
+import '../../widgets/special_product_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -271,6 +273,7 @@ class DynamicDailySpecialsSection extends StatefulWidget {
 class _DynamicDailySpecialsSectionState extends State<DynamicDailySpecialsSection> {
   final SpecialService _specialService = SpecialService();
   List<SpecialModel> _specials = [];
+  Map<String, ProductModel> _relatedProducts = {};
   bool _isLoading = true;
 
   @override
@@ -282,8 +285,21 @@ class _DynamicDailySpecialsSectionState extends State<DynamicDailySpecialsSectio
   Future<void> _loadSpecials() async {
     try {
       final specials = await _specialService.getActiveSpecials();
+      
+      // Load related products
+      Map<String, ProductModel> relatedProducts = {};
+      for (var special in specials) {
+        if (special.relatedProductId != null && special.relatedProductId!.isNotEmpty) {
+          final product = await _specialService.getRelatedProduct(special.relatedProductId);
+          if (product != null) {
+            relatedProducts[special.id] = product;
+          }
+        }
+      }
+      
       setState(() {
         _specials = specials;
+        _relatedProducts = relatedProducts;
         _isLoading = false;
       });
     } catch (e) {
@@ -398,62 +414,86 @@ class _DynamicDailySpecialsSectionState extends State<DynamicDailySpecialsSectio
             ],
           ),
           const SizedBox(height: 16),
-          ..._specials.map((special) => _buildSpecialItem(
-                special.name,
-                '₱${special.price.toStringAsFixed(2)}',
-                special.description,
-              )),
+          ..._specials.map((special) => _buildSpecialItem(special)),
         ],
       ),
     );
   }
 
-  Widget _buildSpecialItem(String name, String price, String description) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.brown[300],
-              borderRadius: BorderRadius.circular(2),
+  Widget _buildSpecialItem(SpecialModel special) {
+    final hasRelatedProduct = _relatedProducts.containsKey(special.id);
+    final product = hasRelatedProduct ? _relatedProducts[special.id] : null;
+    
+    if (hasRelatedProduct && product != null) {
+      // Use the reusable SpecialProductCard for specials with related products
+      return SpecialProductCard(
+        special: special,
+        product: product,
+        onAddToCart: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${special.name} added to cart'),
+              backgroundColor: Colors.green,
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+          );
+        },
+        onViewDetails: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Viewing details for ${product.name}'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        },
+      );
+    } else {
+      // Simple design for standalone specials
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.brown[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    special.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  Text(
+                    special.description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Text(
-            price,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.brown[700],
+            Text(
+              '₱${special.price.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown[700],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 }
 
