@@ -347,7 +347,6 @@ class FeaturedDrinksSection extends StatelessWidget {
                 return _buildFeaturedDrinkCard(
                   drink['name'],
                   drink['image'],
-                  drink['price'],
                   drink['description'],
                   isGridView: true,
                 );
@@ -368,7 +367,6 @@ class FeaturedDrinksSection extends StatelessWidget {
                   return _buildFeaturedDrinkCard(
                     drink['name'],
                     drink['image'],
-                    drink['price'],
                     drink['description'],
                     isGridView: false,
                   );
@@ -385,7 +383,6 @@ class FeaturedDrinksSection extends StatelessWidget {
   Widget _buildFeaturedDrinkCard(
     String name,
     String image,
-    String price,
     String description, {
     required bool isGridView,
   }) {
@@ -409,34 +406,11 @@ class FeaturedDrinksSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                Image.asset(
-                  image,
-                  height: 120,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.brown[800]!.withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      price,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            Image.asset(
+              image,
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
             Padding(
               padding: const EdgeInsets.all(12),
