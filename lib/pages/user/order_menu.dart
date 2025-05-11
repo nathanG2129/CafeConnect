@@ -171,10 +171,10 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
+          const SliverPadding(
+            padding: EdgeInsets.all(16),
             sliver: SliverToBoxAdapter(
-              child: const HeaderSection(),
+              child: HeaderSection(),
             ),
           ),
           SliverPadding(
@@ -211,8 +211,8 @@ class _OrderMenuPageState extends State<OrderMenuPage> {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
-            child: const HeaderSection(),
+          const SliverToBoxAdapter(
+            child: HeaderSection(),
           ),
           SliverToBoxAdapter(
             child: MenuGridSection(

@@ -109,24 +109,24 @@ class CoffeeGuidePage extends StatelessWidget {
   }
   
   Widget _buildTabletLayout() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          const HeaderSection(),
-          const SizedBox(height: 16),
+          HeaderSection(),
+          SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Intro on the left
-              const Expanded(
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(right: 8),
                   child: IntroSection(),
                 ),
               ),
               // Tips on the right
-              const Expanded(
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(left: 8),
                   child: BrewingTipsSection(),
@@ -134,8 +134,8 @@ class CoffeeGuidePage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          const CoffeeTypesSection(),
+          SizedBox(height: 16),
+          CoffeeTypesSection(),
         ],
       ),
     );

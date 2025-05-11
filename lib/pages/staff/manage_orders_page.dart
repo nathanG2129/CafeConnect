@@ -800,14 +800,13 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> with SingleTickerPr
                       fontSize: 14,
                     ),
                   ),
-                  if (item.size != null)
-                    Text(
-                      'Size: ${item.size}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
+                  Text(
+                    'Size: ${item.size}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
                     ),
+                  ),
                 ],
               ),
             ),
