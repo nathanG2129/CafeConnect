@@ -202,28 +202,6 @@ class _LoginFormState extends State<LoginForm> {
                             ),
                           ),
                         ],
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              // Implement forgot password functionality
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Forgot password functionality coming soon'),
-                                  backgroundColor: Colors.amber,
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Forgot Password?',
-                              style: TextStyle(
-                                color: Colors.brown[700],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
